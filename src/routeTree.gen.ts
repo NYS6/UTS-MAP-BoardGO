@@ -10,33 +10,219 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as HomeRouteImport } from './routes/home'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MyGamesRouteImport } from './routes/my-games'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ChatSessionIdRouteImport } from './routes/chat.$sessionId'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
+import { Route as ProfileEditRouteImport } from './routes/profile.edit'
+import { Route as RateSessionIdRouteImport } from './routes/rate.$sessionId'
+import { Route as SessionIdRouteImport } from './routes/session.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyGamesRoute = MyGamesRouteImport.update({
+  id: '/my-games',
+  path: '/my-games',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileSetupRoute = ProfileSetupRouteImport.update({
+  id: '/profile-setup',
+  path: '/profile-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatSessionIdRoute = ChatSessionIdRouteImport.update({
+  id: '/chat/$sessionId',
+  path: '/chat/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileEditRoute = ProfileEditRouteImport.update({
+  id: '/profile/edit',
+  path: '/profile/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RateSessionIdRoute = RateSessionIdRouteImport.update({
+  id: '/rate/$sessionId',
+  path: '/rate/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionIdRoute = SessionIdRouteImport.update({
+  id: '/session/$id',
+  path: '/session/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/discover': typeof DiscoverRoute
+  '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/my-games': typeof MyGamesRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile-setup': typeof ProfileSetupRoute
+  '/register': typeof RegisterRoute
+  '/chat/$sessionId': typeof ChatSessionIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/rate/$sessionId': typeof RateSessionIdRoute
+  '/session/$id': typeof SessionIdRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/discover': typeof DiscoverRoute
+  '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/my-games': typeof MyGamesRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile-setup': typeof ProfileSetupRoute
+  '/register': typeof RegisterRoute
+  '/chat/$sessionId': typeof ChatSessionIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/rate/$sessionId': typeof RateSessionIdRoute
+  '/session/$id': typeof SessionIdRoute
+  '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/discover': typeof DiscoverRoute
+  '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/my-games': typeof MyGamesRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile-setup': typeof ProfileSetupRoute
+  '/register': typeof RegisterRoute
+  '/chat/$sessionId': typeof ChatSessionIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/edit': typeof ProfileEditRoute
+  '/rate/$sessionId': typeof RateSessionIdRoute
+  '/session/$id': typeof SessionIdRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/create'
+    | '/discover'
+    | '/home'
+    | '/login'
+    | '/my-games'
+    | '/notifications'
+    | '/profile-setup'
+    | '/register'
+    | '/chat/$sessionId'
+    | '/profile/$userId'
+    | '/profile/edit'
+    | '/rate/$sessionId'
+    | '/session/$id'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/create'
+    | '/discover'
+    | '/home'
+    | '/login'
+    | '/my-games'
+    | '/notifications'
+    | '/profile-setup'
+    | '/register'
+    | '/chat/$sessionId'
+    | '/profile/$userId'
+    | '/profile/edit'
+    | '/rate/$sessionId'
+    | '/session/$id'
+    | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/discover'
+    | '/home'
+    | '/login'
+    | '/my-games'
+    | '/notifications'
+    | '/profile-setup'
+    | '/register'
+    | '/chat/$sessionId'
+    | '/profile/$userId'
+    | '/profile/edit'
+    | '/rate/$sessionId'
+    | '/session/$id'
+    | '/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CreateRoute: typeof CreateRoute
+  DiscoverRoute: typeof DiscoverRoute
+  HomeRoute: typeof HomeRoute
+  LoginRoute: typeof LoginRoute
+  MyGamesRoute: typeof MyGamesRoute
+  NotificationsRoute: typeof NotificationsRoute
+  ProfileSetupRoute: typeof ProfileSetupRoute
+  RegisterRoute: typeof RegisterRoute
+  ChatSessionIdRoute: typeof ChatSessionIdRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
+  ProfileEditRoute: typeof ProfileEditRoute
+  RateSessionIdRoute: typeof RateSessionIdRoute
+  SessionIdRoute: typeof SessionIdRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +234,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-games': {
+      id: '/my-games'
+      path: '/my-games'
+      fullPath: '/my-games'
+      preLoaderRoute: typeof MyGamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile-setup': {
+      id: '/profile-setup'
+      path: '/profile-setup'
+      fullPath: '/profile-setup'
+      preLoaderRoute: typeof ProfileSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat/$sessionId': {
+      id: '/chat/$sessionId'
+      path: '/chat/$sessionId'
+      fullPath: '/chat/$sessionId'
+      preLoaderRoute: typeof ChatSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/edit': {
+      id: '/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof ProfileEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rate/$sessionId': {
+      id: '/rate/$sessionId'
+      path: '/rate/$sessionId'
+      fullPath: '/rate/$sessionId'
+      preLoaderRoute: typeof RateSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/session/$id': {
+      id: '/session/$id'
+      path: '/session/$id'
+      fullPath: '/session/$id'
+      preLoaderRoute: typeof SessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CreateRoute: CreateRoute,
+  DiscoverRoute: DiscoverRoute,
+  HomeRoute: HomeRoute,
+  LoginRoute: LoginRoute,
+  MyGamesRoute: MyGamesRoute,
+  NotificationsRoute: NotificationsRoute,
+  ProfileSetupRoute: ProfileSetupRoute,
+  RegisterRoute: RegisterRoute,
+  ChatSessionIdRoute: ChatSessionIdRoute,
+  ProfileUserIdRoute: ProfileUserIdRoute,
+  ProfileEditRoute: ProfileEditRoute,
+  RateSessionIdRoute: RateSessionIdRoute,
+  SessionIdRoute: SessionIdRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
