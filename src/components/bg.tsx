@@ -58,7 +58,7 @@ const nav = [
 export function BottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="sticky bottom-0 z-30 mx-3 mb-3 flex items-center justify-between rounded-[22px] bg-surface/85 px-2 py-2 ring-1 ring-border backdrop-blur-xl">
+    <nav className="fixed inset-x-0 bottom-3 z-30 mx-auto flex w-[calc(100%-1.5rem)] max-w-[406px] items-center justify-between rounded-[22px] bg-surface/85 px-2 py-2 ring-1 ring-border backdrop-blur-xl">
       {nav.map(({ to, label, icon: Icon }) => {
         const active = path === to || (to === "/profile" && path === "/profile/");
         if (to === "/create")
@@ -81,8 +81,8 @@ export function BottomNav() {
 export function Screen({ children, nav = true, className }: { children: ReactNode; nav?: boolean; className?: string }) {
   return (
     <div className="flex min-h-screen w-full justify-center bg-secondary">
-      <div className={cn("relative flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-background", className)}>
-        <div className="relative flex-1 pb-4">{children}</div>
+      <div className={cn("relative flex min-h-screen w-full max-w-[430px] flex-col overflow-x-clip bg-background", className)}>
+        <div className={cn("relative flex-1", nav ? "pb-28" : "pb-4")}>{children}</div>
         {nav && <BottomNav />}
       </div>
     </div>
