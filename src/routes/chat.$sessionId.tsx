@@ -34,12 +34,10 @@ function Chat() {
       setTimeout(() => {
         setTyping(false);
         // simulated reply from another player
-        useStoreSend(other);
+        send(sessionId, `__from:${other}__${replies[Math.floor(Math.random() * replies.length)]}`);
       }, 1400);
     }
   };
-  const { send: rawSend } = useStore();
-  const useStoreSend = (from: string) => rawSend(sessionId, `__from:${from}__${replies[Math.floor(Math.random() * replies.length)]}`);
 
   if (!s) return <Screen><TopBar back title="Chat" /><p className="px-5 text-muted-foreground">Chat not found.</p></Screen>;
   const g = getGame(s.gameId);
