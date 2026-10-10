@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Frontend-only prototype: all data is local mock data in src/lib/data.ts with shared state in src/lib/store.tsx (React context), because the brief forbids any backend.
