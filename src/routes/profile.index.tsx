@@ -12,7 +12,7 @@ export const Route = createFileRoute("/profile/")({
 
 function Me() {
   const { profile } = useStore();
-  const me = players[0];
+  const me = players[0]!;
   return (
     <Screen>
       <TopBar light title="" />

@@ -52,14 +52,14 @@ function Chat() {
           {msgs.map((m) => {
             let from = m.from, body = m.text;
             const mm = body.match(/^__from:(\w+)__(.*)$/);
-            if (mm) { from = mm[1]; body = mm[2]; }
+            if (mm) { from = mm[1]!; body = mm[2]!; }
             if (from === "system") return <p key={m.id} className="text-center font-mono text-[11px] text-muted-foreground">{body}</p>;
             const me = from === "me";
             return (
               <div key={m.id} className={cn("rise flex items-end gap-2", me && "flex-row-reverse")}>
                 {!me && <Avatar id={from} size="sm" />}
                 <div className={cn("max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm", me ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-surface ring-1 ring-border")}>
-                  {!me && <p className="mb-0.5 text-[11px] font-semibold text-muted-foreground">{getPlayer(from).name.split(" ")[0]}</p>}
+                  {!me && <p className="mb-0.5 text-[11px] font-semibold text-muted-foreground">{getPlayer(from).name.split(" ")[0]!}</p>}
                   {body}
                   <p className={cn("mt-1 text-right font-mono text-[9px]", me ? "text-primary-foreground/70" : "text-muted-foreground")}>{m.time}</p>
                 </div>

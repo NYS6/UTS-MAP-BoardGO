@@ -61,4 +61,4 @@ export const pastSessionIds = ["s7"];
 
 export const getGame = (id: string) => games.find((g) => g.id === id)!;
 export const getVenue = (id: string) => venues.find((v) => v.id === id)!;
-export const getPlayer = (id: string) => players.find((p) => p.id === id) ?? players[0];
+export const getPlayer = (id: string) => players.find((p) => p.id === id) ?? players[0]!;

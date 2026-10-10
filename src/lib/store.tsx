@@ -32,7 +32,7 @@ export const defaultFilters: Filters = { area: "All", games: [], level: "Any", d
 const now = () => new Date().toTimeString().slice(0, 5);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const me = players[0];
+  const me = players[0]!;
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
   const [profile, setProfile] = useState<Profile>({ name: me.name, bio: me.bio, area: me.area, favorites: me.favorites, level: me.level });
   const [filters, setFilters] = useState<Filters>(defaultFilters);
