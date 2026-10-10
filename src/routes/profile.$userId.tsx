@@ -26,7 +26,7 @@ function Other() {
   return (
     <Screen>
       <TopBar back light right={<button onClick={() => setSheet("menu")} aria-label="More" className="grid size-10 place-items-center rounded-full bg-glass/25 text-primary-foreground ring-1 ring-glass/40 backdrop-blur-md"><MoreHorizontal className="size-4" /></button>} />
-      <PlayerView id={p.id} {...p}
+      <PlayerView {...p}
         actions={isBlocked ? <p className="w-full text-center font-mono text-[11px] text-destructive">You blocked this player</p>
           : <><button className={btn + " flex-1"} onClick={() => toast.success(`Invite sent to ${p.name.split(" ")[0]}`)}>Invite to a game</button><button className={btnGhost} onClick={() => nav({ to: "/discover" })}>Tables</button></>} />
 

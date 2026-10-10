@@ -43,7 +43,7 @@ function Rate() {
               ))}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              {tags.map((t) => { const on = picked[pid]?.includes(t); return <Chip key={t} active={on} onClick={() => setPicked({ ...picked, [pid]: on ? picked[pid].filter((x) => x !== t) : [...(picked[pid] ?? []), t] })}>{t}</Chip>; })}
+              {tags.map((t) => { const on = !!picked[pid]?.includes(t); return <Chip key={t} active={on} onClick={() => setPicked({ ...picked, [pid]: on ? picked[pid]!.filter((x) => x !== t) : [...(picked[pid] ?? []), t] })}>{t}</Chip>; })}
             </div>
           </div>
         ))}
