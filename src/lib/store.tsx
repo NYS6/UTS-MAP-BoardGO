@@ -3,7 +3,7 @@ import { initialSessions, players, type Session } from "./data";
 
 export type Msg = { id: string; from: string; text: string; time: string };
 export type Notif = { id: string; title: string; body: string; time: string; read: boolean; link?: string };
-export type Filters = { area: string; games: string[]; level: string; day: string };
+export type Filters = { area: string; games: string[]; level: string; day: string; maxKm: number };
 
 type Profile = { name: string; bio: string; area: string; favorites: string[]; level: string };
 
@@ -27,7 +27,7 @@ type Store = {
 };
 
 const Ctx = createContext<Store | null>(null);
-export const defaultFilters: Filters = { area: "All", games: [], level: "Any", day: "Any" };
+export const defaultFilters: Filters = { area: "All", games: [], level: "Any", day: "Any", maxKm: 10 };
 
 const now = () => new Date().toTimeString().slice(0, 5);
 
