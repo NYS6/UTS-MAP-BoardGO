@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
 | 5 | **Nearby (jarak GPS)** | `ui/screens/nearby/NearbyScreen.kt` | **Peta mock**: pin venue (jarak+bearing), lingkaran radius, chip 1–10 km, zoom/recenter |
 | 6 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Argumen `gameId`, stat blocks, kartu sesi + SeatPill + Join |
 | 7 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
-| 8 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab Upcoming/Past |
+| 8 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab **Upcoming / Hosting / Past** (Hosting = sesi yang kita host, hasil Publish juga masuk) |
 | 9 | **Chat Sesi** | `ui/screens/chat/ChatScreen.kt` | Bubble chat (masuk/keluar/sistem), input "Message the table", argumen `sessionId` |
 | 10 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, **toggle dark mode** (System/Light/Dark), log out |
 
@@ -261,7 +261,7 @@ android/app/src/main/java/id/boardgo/
         ├── list/GameListScreen.kt         // List/LazyColumn + foto cover
         ├── detail/GameDetailScreen.kt     // Detail + argumen gameId
         ├── form/CreateSessionScreen.kt    // Form validasi angka & email
-        ├── mygames/MyGamesScreen.kt       // Tab Upcoming/Past
+        ├── mygames/MyGamesScreen.kt       // Tab Upcoming/Hosting/Past
         ├── chat/ChatScreen.kt             // Chat sesi (bubble + input)
         ├── profile/ProfileScreen.kt       // Profil & statistik
 res/

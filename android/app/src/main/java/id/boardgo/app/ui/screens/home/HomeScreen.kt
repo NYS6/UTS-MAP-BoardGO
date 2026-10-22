@@ -110,7 +110,7 @@ fun HomeScreen(
                                     Spacer(Modifier.width(10.dp))
                                     Text(
                                         text = "BOARDGO",
-                                        style = MaterialTheme.typography.headlineMedium,
+                                        style = MaterialTheme.typography.displaySmall,
                                         color = Color.White
                                     )
                                     Spacer(Modifier.weight(1f))

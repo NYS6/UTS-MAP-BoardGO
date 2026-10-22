@@ -81,7 +81,9 @@ object DummyData {
         GameSession("s10", "checkers", "v7", "u2", "Sun", "10:00", 2, listOf("u2"), Level.BEGINNER, "Relaxed Sunday morning game.", "Free"),
         GameSession("s12", "werewolf", "v6", "u1", "Sat", "19:00", 10, listOf("u1", "u2", "u4", "u5"), Level.BEGINNER, "Big group night, moderator provided.", "Rp10k"),
         GameSession("s13", "scrabble", "v3", "u4", "Sun", "16:00", 4, listOf("u4"), Level.CASUAL, "English dictionary, timer optional.", "Free"),
-        GameSession("s7", "catan", "v2", "me", "Last Fri", "19:00", 4, listOf("me", "u1", "u2", "u4"), Level.CASUAL, "Done! Great games.", "Free")
+        GameSession("s7", "catan", "v2", "me", "Last Fri", "19:00", 4, listOf("me", "u1", "u2", "u4"), Level.CASUAL, "Done! Great games.", "Free"),
+        // Sesi yang DI-HOST oleh user saat ini (muncul di tab Hosting di My Games)
+        GameSession("s14", "monopoly", "v7", "me", "Sun", "15:00", 5, listOf("me", "u2"), Level.CASUAL, "Sunday family rules — Free Parking jackpot!", "Free")
     )
 
     /** Sesi yang sudah lewat (untuk tab "Past" di My Games). */

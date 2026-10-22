@@ -64,11 +64,11 @@ fun WelcomeScreen(
 
             Text(
                 text = "BOARDGO",
-                style = MaterialTheme.typography.labelMedium,
-                color = Color.White.copy(alpha = 0.9f)
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.White
             )
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Slogan display (putih + oranye, seperti design asli)
             Text(

@@ -36,6 +36,7 @@ import id.boardgo.app.ui.components.SectionLabel
 import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
+import id.boardgo.app.ui.viewmodel.MyGamesTab
 
 /**
  * ====================== LAYAR MY GAMES ====================================
@@ -62,7 +63,7 @@ fun MyGamesScreen(
                 TopBar(title = "My games")
             }
 
-            // ---------- Tab Upcoming / Past (state remember + ViewModel) ----------
+            // ---------- Tab Upcoming / Hosting / Past ----------
             item {
                 Row(
                     modifier = Modifier
@@ -72,13 +73,18 @@ fun MyGamesScreen(
                 ) {
                     TabPill(
                         text = "Upcoming",
-                        selected = !state.showPast,
-                        onClick = { viewModel.onMyGamesTabChange(false) }
+                        selected = state.tab == MyGamesTab.UPCOMING,
+                        onClick = { viewModel.onMyGamesTabChange(MyGamesTab.UPCOMING) }
+                    )
+                    TabPill(
+                        text = "Hosting",
+                        selected = state.tab == MyGamesTab.HOSTING,
+                        onClick = { viewModel.onMyGamesTabChange(MyGamesTab.HOSTING) }
                     )
                     TabPill(
                         text = "Past",
-                        selected = state.showPast,
-                        onClick = { viewModel.onMyGamesTabChange(true) }
+                        selected = state.tab == MyGamesTab.PAST,
+                        onClick = { viewModel.onMyGamesTabChange(MyGamesTab.PAST) }
                     )
                 }
             }
@@ -93,8 +99,11 @@ fun MyGamesScreen(
             if (sessions.isEmpty()) {
                 item {
                     Text(
-                        text = if (state.showPast) "No past sessions yet."
-                        else "No upcoming tables — join or host one!",
+                        text = when (state.tab) {
+                            MyGamesTab.HOSTING -> "You're not hosting any table yet — tap + to host one!"
+                            MyGamesTab.PAST -> "No past sessions yet."
+                            else -> "No upcoming tables — join or host one!"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp)
@@ -104,7 +113,8 @@ fun MyGamesScreen(
                 items(sessions, key = { it.id }) { session ->
                     SessionRow(
                         session = session,
-                        past = state.showPast,
+                        past = state.tab == MyGamesTab.PAST,
+                        hosting = state.tab == MyGamesTab.HOSTING,
                         onClick = { onGameClick(session.gameId) },
                         onChat = { onChat(session.id) },
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
@@ -147,11 +157,12 @@ private fun TabPill(
     }
 }
 
-/** Baris sesi (cover + info + seat pill + link chat). */
+/** Baris sesi (cover + info + seat pill / label host + link chat). */
 @Composable
 private fun SessionRow(
     session: GameSession,
     past: Boolean,
+    hosting: Boolean = false,
     onClick: () -> Unit,
     onChat: () -> Unit,
     modifier: Modifier = Modifier
@@ -212,7 +223,25 @@ private fun SessionRow(
             }
         }
         if (!past) {
-            SeatPill(seatsLeft = seatsLeft)
+            if (hosting) {
+                // Label khusus sesi yang kita host
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f))
+                        .padding(horizontal = 9.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "YOU'RE HOST",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else {
+                id.boardgo.app.ui.components.SeatPill(
+                    seatsLeft = session.maxPlayers - session.joinedPlayerIds.size
+                )
+            }
         }
     }
 }

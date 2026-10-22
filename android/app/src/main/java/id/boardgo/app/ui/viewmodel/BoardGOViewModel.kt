@@ -151,13 +151,22 @@ data class ChatUiState(
     val messagesBySession: Map<String, List<ChatMessage>> = emptyMap()
 )
 
-/** State layar My Games (tab Upcoming / Past). */
+/** Tab layar My Games. */
+enum class MyGamesTab { UPCOMING, HOSTING, PAST }
+
+/** State layar My Games (tab Upcoming / Hosting / Past). */
 data class MyGamesUiState(
-    val showPast: Boolean = false,
+    val tab: MyGamesTab = MyGamesTab.UPCOMING,
     val upcoming: List<GameSession> = emptyList(),
+    val hosting: List<GameSession> = emptyList(),
     val past: List<GameSession> = emptyList()
 ) {
-    val current: List<GameSession> get() = if (showPast) past else upcoming
+    val current: List<GameSession>
+        get() = when (tab) {
+            MyGamesTab.UPCOMING -> upcoming
+            MyGamesTab.HOSTING -> hosting
+            MyGamesTab.PAST -> past
+        }
 }
 
 /** State layar Profil. */
@@ -483,6 +492,27 @@ class BoardGOViewModel : ViewModel() {
             _formState.update { it.copy(isSubmitting = true) }
             delay(700)
             val newId = "c${System.currentTimeMillis()}"
+
+            // >>> Buat sesi NYATA (di-host oleh user) & masukkan ke data <<<
+            val form = _formState.value
+            val newSession = id.boardgo.app.data.model.GameSession(
+                id = newId,
+                gameId = form.gameId,
+                venueId = form.venueId,
+                hostId = DummyData.CURRENT_USER_ID,
+                day = form.day,
+                time = form.time,
+                maxPlayers = form.maxPlayers.toIntOrNull() ?: 4,
+                joinedPlayerIds = listOf(DummyData.CURRENT_USER_ID),
+                level = id.boardgo.app.data.model.Level.CASUAL,
+                note = form.note.ifBlank { "Come play!" },
+                fee = form.fee
+            )
+            _allSessions.update { it + newSession }
+            _homeState.update { h -> h.copy(sessions = _allSessions.value) }
+            loadMyGames()
+            loadProfile()
+
             _formState.update {
                 it.copy(isSubmitting = false, isSubmitSuccess = true, createdSessionId = newId)
             }
@@ -559,19 +589,27 @@ class BoardGOViewModel : ViewModel() {
     val myGamesState: StateFlow<MyGamesUiState> = _myGamesState.asStateFlow()
 
     fun loadMyGames() {
-        val joined = _allSessions.value.filter {
-            DummyData.CURRENT_USER_ID in it.joinedPlayerIds
+        val all = _allSessions.value
+        // Upcoming: diikuti DAN bukan yang kita host
+        val upcoming = all.filter {
+            DummyData.CURRENT_USER_ID in it.joinedPlayerIds &&
+                it.hostId != DummyData.CURRENT_USER_ID &&
+                it.id !in DummyData.pastSessionIds
         }
-        _myGamesState.update {
-            it.copy(
-                upcoming = joined.filter { s -> s.id !in DummyData.pastSessionIds },
-                past = joined.filter { s -> s.id in DummyData.pastSessionIds }
-            )
+        // Hosting: sesi yang kita host (belum lewat)
+        val hosting = all.filter {
+            it.hostId == DummyData.CURRENT_USER_ID && it.id !in DummyData.pastSessionIds
         }
+        // Past: sesi lampau yang diikuti
+        val past = all.filter {
+            DummyData.CURRENT_USER_ID in it.joinedPlayerIds &&
+                it.id in DummyData.pastSessionIds
+        }
+        _myGamesState.update { it.copy(upcoming = upcoming, hosting = hosting, past = past) }
     }
 
-    fun onMyGamesTabChange(showPast: Boolean) {
-        _myGamesState.update { it.copy(showPast = showPast) }
+    fun onMyGamesTabChange(tab: MyGamesTab) {
+        _myGamesState.update { it.copy(tab = tab) }
     }
 
     // =================== State Profil =======================================
