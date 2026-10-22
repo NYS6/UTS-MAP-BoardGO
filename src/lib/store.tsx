@@ -15,7 +15,7 @@ type Store = {
   leave: (id: string) => void;
   create: (s: Omit<Session, "id" | "hostId" | "playerIds">) => string;
   chats: Record<string, Msg[]>;
-  send: (sid: string, text: string) => void;
+  send: (sid: string, text: string, from?: string) => void;
   notifs: Notif[];
   markAllRead: () => void;
   filters: Filters;
@@ -68,7 +68,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       push({ title: "Session published", body: "Players nearby can now join your table.", link: `/session/${id}` });
       return id;
     },
-    send: (sid, text) => setChats((c) => ({ ...c, [sid]: [...(c[sid] ?? []), { id: String(Date.now()), from: "me", text, time: now() }] })),
+    send: (sid, text, from = "me") => setChats((c) => ({ ...c, [sid]: [...(c[sid] ?? []), { id: String(Date.now()) + from, from, text, time: now() }] })),
     markAllRead: () => setNotifs((x) => x.map((n) => ({ ...n, read: true }))),
     rate: (sid) => setRated((r) => [...r, sid]),
     block: (uid) => setBlocked((b) => [...b, uid]),

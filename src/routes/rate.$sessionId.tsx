@@ -37,7 +37,7 @@ function Rate() {
             <div className="flex items-center gap-3"><Avatar id={pid} /><p className="font-semibold">{getPlayer(pid).name}</p></div>
             <div className="mt-3 flex gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n} aria-label={`${n} stars`} onClick={() => setScores({ ...scores, [pid]: n })}>
+                <button key={n} type="button" className="grid size-11 place-items-center" aria-label={`${n} stars`} onClick={() => setScores({ ...scores, [pid]: n })}>
                   <Star className={cn("size-8 transition", (scores[pid] ?? 0) >= n ? "fill-meeple text-meeple" : "text-muted")} />
                 </button>
               ))}
@@ -49,7 +49,8 @@ function Rate() {
         ))}
       </div>
       <div className="px-5 pt-6">
-        <button disabled={!allDone} className={btn + " w-full"} onClick={() => { rate(s.id); toast.success("Ratings sent — play again soon!"); nav({ to: "/discover" }); }}>Submit ratings</button>
+        <button disabled={!allDone} className={btn + " w-full"} onClick={() => { rate(s.id); toast.success("Ratings sent — play again soon!"); nav({ to: "/my-games" }); }}>Submit ratings</button>
+        {!allDone && <p className="mt-2 text-center text-xs text-muted-foreground">Rate all players to submit ({others.filter((p) => scores[p]).length} of {others.length} rated)</p>}
       </div>
     </Screen>
   );

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useStore } from "@/lib/store";
 import { Screen, SkyBackdrop, TopBar, btn, input } from "@/components/bg";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
@@ -10,6 +11,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const reg = mode === "register";
+  const { profile, setProfile } = useStore();
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +19,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     if (!/\S+@\S+\.\S+/.test(email)) return setErr("Enter a valid email");
     if (pw.length < 6) return setErr("Password must be at least 6 characters");
     setErr(""); setLoading(true);
+    if (reg) setProfile({ ...profile, name: name.trim() });
     setTimeout(() => nav({ to: reg ? "/profile-setup" : "/home" }), 700);
   };
 
