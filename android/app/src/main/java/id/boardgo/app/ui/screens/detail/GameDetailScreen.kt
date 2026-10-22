@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -159,7 +160,10 @@ fun GameDetailScreen(
 
                     // ---------- Sesi tersedia ----------
                     item {
-                        SectionLabel(text = "Sesi tersedia (${state.sessions.size})")
+                        SectionLabel(
+                            text = "Sesi tersedia (${state.sessions.size})",
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        )
                     }
 
                     if (state.sessions.isEmpty()) {
@@ -194,13 +198,13 @@ fun GameDetailScreen(
                     }
                 }
 
-                // ---------- Tombol aksi (fixed di bawah) ----------
+                // ---------- Tombol aksi (fixed di bawah, di atas bottom nav 92dp) ----------
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                        .padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 104.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         BoardGoGhostButton(
@@ -218,11 +222,12 @@ fun GameDetailScreen(
             }
         }
 
-        // Tombol back mengambang di atas hero
+        // Tombol back mengambang di atas hero (dengan status bar padding)
         if (state.status == LoadStatus.SUCCESS) {
             Box(
                 modifier = Modifier
-                    .padding(start = 20.dp, top = 12.dp)
+                    .statusBarsPadding()
+                    .padding(start = 20.dp, top = 8.dp)
                     .size(40.dp)
                     .clip(RoundedCornerShape(50))
                     .background(Color.White.copy(alpha = 0.9f))

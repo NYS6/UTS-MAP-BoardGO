@@ -1,6 +1,7 @@
 package id.boardgo.app.ui.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -146,7 +147,10 @@ fun ProfileScreen(
 
             // ---------- Game favorit ----------
             item {
-                SectionLabel(text = "Game favorit")
+                SectionLabel(
+                    text = "Game favorit",
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
             }
             items(state.favoriteGames, key = { it.id }) { game ->
                 FavoriteRow(
@@ -158,7 +162,10 @@ fun ProfileScreen(
 
             // ---------- Sesi yang diikuti ----------
             item {
-                SectionLabel(text = "Sesi yang diikuti (${state.joinedSessions.size})")
+                SectionLabel(
+                    text = "Sesi yang diikuti (${state.joinedSessions.size})",
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
             }
             if (state.joinedSessions.isEmpty()) {
                 item {
@@ -246,6 +253,7 @@ private fun FavoriteRow(
             .padding(horizontal = 20.dp, vertical = 4.dp)
             .clip(RoundedCornerShape(14.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

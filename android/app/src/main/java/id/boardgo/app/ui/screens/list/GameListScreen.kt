@@ -127,7 +127,10 @@ fun GameListScreen(
 
                     // ---------- Filter kategori (horizontal) ----------
                     item {
-                        SectionLabel(text = "Kategori")
+                    SectionLabel(
+                        text = "Kategori",
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -148,7 +151,8 @@ fun GameListScreen(
                     // ---------- Daftar game (LAZY COLUMN) ----------
                     item {
                         SectionLabel(
-                            text = "${state.filteredGames.size} game ditemukan"
+                            text = "${state.filteredGames.size} game ditemukan",
+                            modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
 

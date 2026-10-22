@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,6 +68,7 @@ fun TopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -198,7 +201,9 @@ fun AvatarStack(
 ) {
     Row(modifier = modifier) {
         playerIds.take(4).forEachIndexed { index, id ->
-            Box(modifier = Modifier.padding(start = if (index == 0) 0.dp else (-8).dp)) {
+            // Catatan: offset (bukan padding) agar boleh negatif — padding negatif
+            // akan crash dengan "Padding must be non-negative".
+            Box(modifier = Modifier.offset(x = if (index == 0) 0.dp else (-8).dp)) {
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)

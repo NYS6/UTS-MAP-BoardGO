@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -133,9 +131,9 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     initialGameId = gameId,
                     onBack = { navController.popBackStack() },
-                    onSuccess = { createdId ->
-                        // Navigasi ke detail sesi yang baru dibuat
-                        navController.navigate(Routes.detail(createdId)) {
+                    onSuccess = { selectedGameId ->
+                        // Buka Detail game yang baru saja di-host
+                        navController.navigate(Routes.detail(selectedGameId)) {
                             popUpTo(Routes.LIST)
                         }
                     }
@@ -189,10 +187,9 @@ private fun BottomNavBar(
 ) {
     val items = listOf(
         NavItem(Routes.LIST, "HOME", Icons.Filled.Home),
-        NavItem(Routes.DETAIL.replace("{gameId}", "catan"), "FIND", Icons.Filled.Explore),
         null, // tempat tombol "+"
         NavItem(Routes.PROFILE, "ME", Icons.Filled.Person),
-        NavItem(Routes.NATIVE, "GPS", Icons.Filled.Place)
+        NavItem(Routes.NATIVE, "FITUR", Icons.Filled.Place)
     )
 
     Box(

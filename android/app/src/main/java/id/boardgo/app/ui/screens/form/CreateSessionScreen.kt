@@ -76,11 +76,12 @@ fun CreateSessionScreen(
         }
     }
 
-    // Navigasi ke detail sesi yang baru dibuat
+    // Navigasi ke layar Detail GAME yang sesi-nya baru dibuat
+    // (createdSessionId hanya penanda sukses; tujuan navigasi = gameId terpilih)
     LaunchedEffect(state.isSubmitSuccess, state.createdSessionId) {
-        val id = state.createdSessionId
-        if (state.isSubmitSuccess && id != null) {
-            onSuccess(id)
+        val selectedGame = state.gameId
+        if (state.isSubmitSuccess && selectedGame.isNotBlank()) {
+            onSuccess(selectedGame)
             viewModel.resetForm()
         }
     }
