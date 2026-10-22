@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme dasar hanya untuk splash/status bar. Seluruh UI aplikasi digambar
+         dengan Jetpack Compose (Material 3 + custom theme). -->
+    <style name="Theme.BoardGO" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#2750A2</item>
+        <item name="android:navigationBarColor">#F4F7FB</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
