@@ -38,3 +38,14 @@ object BoardGoColors {
     val Player3 = Color(0xFF557CAF)
     val Player4 = Color(0xFFA864A2)
 }
+
+/** Token warna khusus varian gelap (dark mode). */
+object BoardGoDark {
+    val Background = Color(0xFF0A1120)      // navy sangat gelap
+    val OnBackground = Color(0xFFE8EEF7)
+    val Surface = Color(0xFF121B2B)
+    val SurfaceVariant = Color(0xFF1E293B)
+    val OnSurfaceVariant = Color(0xFF94A7BF)
+    val Outline = Color(0xFF2B3B54)
+    val OutlineVariant = Color(0xFF3A4E6B)
+}

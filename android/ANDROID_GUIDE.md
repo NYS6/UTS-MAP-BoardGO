@@ -98,12 +98,15 @@ class MainActivity : ComponentActivity() {
 | # | Layar | File | Teknologi Utama |
 |---|-------|------|-----------------|
 | 1 | **Welcome / Landing** | `ui/screens/welcome/WelcomeScreen.kt` | Slogan "FIND PEOPLE. FIND GAMES. PLAY TOGETHER." + foto papan asli |
-| 2 | **List / Discover** | `ui/screens/list/GameListScreen.kt` | **`LazyColumn`** + pencarian + filter kategori + cover foto game |
-| 3 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Menerima argumen `gameId`, stat blocks, kartu sesi + SeatPill |
-| 4 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
-| 5 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab Upcoming/Past (`remember` + ViewModel) |
-| 6 | **Fitur Native (Mockup)** | `ui/screens/nativefeature/NativeFeatureScreen.kt` | Mockup **GPS + QR Scanner (kamera) + Biometrik** — tanpa hardware asli |
-| 7 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, log out (mockup) |
+| 2 | **Register / Login** | `ui/screens/auth/AuthScreen.kt` | "GRAB A SEAT"/"WELCOME BACK" + validasi nama/email/password (min 6) |
+| 3 | **Home (dashboard)** | `ui/screens/home/HomeScreen.kt` | "FIND A TABLE IN 30 SEC", chip filter, kartu Featured + Join (mockup) |
+| 4 | **List / Discover** | `ui/screens/list/GameListScreen.kt` | **`LazyColumn`** + pencarian + filter kategori + cover foto game |
+| 5 | **Nearby (jarak GPS)** | `ui/screens/nearby/NearbyScreen.kt` | **Peta mock**: pin venue (jarak+bearing), lingkaran radius, chip 1–10 km, zoom/recenter |
+| 6 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Argumen `gameId`, stat blocks, kartu sesi + SeatPill + Join |
+| 7 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
+| 8 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab Upcoming/Past |
+| 9 | **Fitur Native (Mockup)** | `ui/screens/nativefeature/NativeFeatureScreen.kt` | Mockup **GPS + QR Scanner (kamera) + Biometrik** — tanpa hardware asli |
+| 10 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, **toggle dark mode** (System/Light/Dark), log out |
 
 ---
 
@@ -124,6 +127,16 @@ Semua file di `ui/theme/` **dibuat sendiri**, bukan template default Android Stu
 **Aset visual asli** dari repo web juga dibundel di `res/drawable/game_*.jpg`
 (12 foto game: Catan, Wingspan, Azul, …) — dipakai untuk cover kartu, hero detail,
 thumbnail My Games & Profil, sehingga tampilan identik dengan app web.
+
+**Dark mode manual**: `Theme.kt` menyediakan skema gelap navy (`BoardGoDark`) +
+skema terang; `MainActivity` memilih berdasarkan state `ThemeMode`
+(System / Light / Dark) dari ViewModel. Toggle ada di **Profil → APPEARANCE**.
+
+**Fitur jarak GPS (Nearby)**: layar `NearbyScreen` menampilkan peta mock
+(jalan/sungai/taman digambar Canvas), pin venue diposisikan dari **jarak (km) +
+bearing** memakai proyeksi sama seperti web app (`venuePoint`), lingkaran radius
+pencarian, chip radius 1/2/3/5/10 km, kontrol zoom + recenter, dan daftar sesi
+terurut jarak dengan badge km — semuanya dari dummy data (tanpa GPS asli).
 
 ---
 

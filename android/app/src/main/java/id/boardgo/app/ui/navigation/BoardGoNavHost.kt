@@ -38,31 +38,41 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import id.boardgo.app.ui.screens.auth.AuthScreen
 import id.boardgo.app.ui.screens.detail.GameDetailScreen
 import id.boardgo.app.ui.screens.form.CreateSessionScreen
+import id.boardgo.app.ui.screens.home.HomeScreen
 import id.boardgo.app.ui.screens.list.GameListScreen
 import id.boardgo.app.ui.screens.mygames.MyGamesScreen
 import id.boardgo.app.ui.screens.nativefeature.NativeFeatureScreen
+import id.boardgo.app.ui.screens.nearby.NearbyScreen
 import id.boardgo.app.ui.screens.profile.ProfileScreen
 import id.boardgo.app.ui.screens.welcome.WelcomeScreen
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
 /**
- * ============================ NAVIGASI ====================================
+ * ============================== NAVIGASI ==================================
  * Route:
- *  - "welcome"               : landing (start destination)
- *  - "list"                  : Layar List / Discover (LazyColumn)
- *  - "detail/{gameId}"       : Detail  << ARGUMEN gameId dari List
- *  - "create?gameId={gameId}" : Form (opsional pra-isi dari Detail)
- *  - "mygames"               : My Games (tab Upcoming/Past)
- *  - "native"                : Fitur Native mockup
- *  - "profile"               : Profil (Log out -> kembali ke welcome)
- * =======================================================================
+ *  - "welcome"                : landing        (start destination)
+ *  - "register" / "login"     : AuthForm (GRAB A SEAT / WELCOME BACK)
+ *  - "home"                   : dashboard home ("FIND A TABLE IN 30 SEC")
+ *  - "list"                   : Discover (LazyColumn daftar game)
+ *  - "nearby"                 : FITUR JARAK GPS (peta mock + radius km)
+ *  - "detail/{gameId}"        : Detail  << argumen gameId
+ *  - "create?gameId={gameId}"  : Form (argumen opsional)
+ *  - "mygames"                : My Games (Upcoming/Past)
+ *  - "native"                 : Fitur native mockup
+ *  - "profile"                : Profil (+ toggle dark mode, log out)
+ * =========================================================================
  */
 object Routes {
     const val WELCOME = "welcome"
+    const val REGISTER = "register"
+    const val LOGIN = "login"
+    const val HOME = "home"
     const val LIST = "list"
+    const val NEARBY = "nearby"
     const val DETAIL = "detail/{gameId}"
     const val CREATE = "create?gameId={gameId}"
     const val MYGAMES = "mygames"
@@ -83,6 +93,12 @@ fun BoardGoNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    // Layar tanpa bottom nav (landing & auth)
+    val hideBottomBar = currentRoute == null ||
+        currentRoute == Routes.WELCOME ||
+        currentRoute == Routes.REGISTER ||
+        currentRoute == Routes.LOGIN
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -93,24 +109,84 @@ fun BoardGoNavHost(
             startDestination = Routes.WELCOME,
             modifier = Modifier.fillMaxSize()
         ) {
-            // ---------- WELCOME (landing) ----------
+            // ---------- WELCOME ----------
             composable(Routes.WELCOME) {
                 WelcomeScreen(
+                    onCreateAccount = { navController.navigate(Routes.REGISTER) },
+                    onLogin = { navController.navigate(Routes.LOGIN) },
                     onStart = {
-                        navController.navigate(Routes.LIST) {
+                        navController.navigate(Routes.HOME) {
                             popUpTo(Routes.WELCOME) { inclusive = true }
                         }
                     }
                 )
             }
 
-            // ---------- LIST / DISCOVER ----------
+            // ---------- REGISTER ----------
+            composable(Routes.REGISTER) {
+                AuthScreen(
+                    isRegister = true,
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onSwitchAuth = {
+                        navController.navigate(Routes.LOGIN) {
+                            popUpTo(Routes.REGISTER) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onSuccess = { navController.toHomeFromAuth() }
+                )
+            }
+
+            // ---------- LOGIN ----------
+            composable(Routes.LOGIN) {
+                AuthScreen(
+                    isRegister = false,
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onSwitchAuth = {
+                        navController.navigate(Routes.REGISTER) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onSuccess = { navController.toHomeFromAuth() }
+                )
+            }
+
+            // ---------- HOME ----------
+            composable(Routes.HOME) {
+                HomeScreen(
+                    viewModel = viewModel,
+                    onNearby = { navController.navigate(Routes.NEARBY) },
+                    onSeeAll = { navController.navigate(Routes.LIST) },
+                    onSessionClick = { gameId ->
+                        navController.navigate(Routes.detail(gameId))
+                    }
+                )
+            }
+
+            // ---------- DISCOVER (LIST) ----------
             composable(Routes.LIST) {
                 GameListScreen(
                     viewModel = viewModel,
                     onGameClick = { gameId ->
-                        // >>> PASSING ARGUMENT: gameId ke layar Detail <<<
+                        // >>> PASSING ARGUMENT: gameId -> Detail <<<
                         navController.navigate(Routes.detail(gameId))
+                    },
+                    onNearby = { navController.navigate(Routes.NEARBY) }
+                )
+            }
+
+            // ---------- NEARBY (FITUR JARAK GPS) ----------
+            composable(Routes.NEARBY) {
+                NearbyScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onToList = {
+                        navController.navigate(Routes.LIST) {
+                            popUpTo(Routes.HOME)
+                        }
                     }
                 )
             }
@@ -126,7 +202,7 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onCreateSession = { selectedGameId ->
-                        // >>> PASSING ARGUMENT: gameId ke layar Form <<<
+                        // >>> PASSING ARGUMENT: gameId -> Form <<<
                         navController.navigate(Routes.create(selectedGameId))
                     }
                 )
@@ -150,7 +226,7 @@ fun BoardGoNavHost(
                     onBack = { navController.popBackStack() },
                     onSuccess = { selectedGameId ->
                         navController.navigate(Routes.detail(selectedGameId)) {
-                            popUpTo(Routes.LIST)
+                            popUpTo(Routes.HOME)
                         }
                     }
                 )
@@ -178,7 +254,6 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) },
                     onLogout = {
-                        // Mockup log out: kembali ke layar welcome
                         navController.navigate(Routes.WELCOME) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -187,8 +262,8 @@ fun BoardGoNavHost(
             }
         }
 
-        // ---------- Bottom navigation (pill melayang, gaya web app) ----------
-        if (currentRoute != null && currentRoute != Routes.WELCOME) {
+        // ---------- Bottom navigation (pill melayang) ----------
+        if (!hideBottomBar) {
             BottomNavBar(
                 currentRoute = currentRoute,
                 modifier = Modifier.align(Alignment.BottomCenter),
@@ -204,6 +279,13 @@ fun BoardGoNavHost(
                 onCreate = { navController.navigate(Routes.create()) }
             )
         }
+    }
+}
+
+/** Navigasi setelah auth sukses -> Home, bersihkan seluruh back stack. */
+private fun NavHostController.toHomeFromAuth() {
+    navigate(Routes.HOME) {
+        popUpTo(0) { inclusive = true }
     }
 }
 
@@ -223,7 +305,7 @@ private fun BottomNavBar(
     onCreate: () -> Unit
 ) {
     val items = listOf(
-        NavItem(Routes.LIST, "HOME", Icons.Filled.Home),
+        NavItem(Routes.HOME, "HOME", Icons.Filled.Home),
         NavItem(Routes.MYGAMES, "MINE", Icons.Filled.ViewAgenda),
         null, // tombol "+"
         NavItem(Routes.PROFILE, "ME", Icons.Filled.Person),
@@ -248,7 +330,6 @@ private fun BottomNavBar(
         ) {
             items.forEach { item ->
                 if (item == null) {
-                    // Tombol "+" (layar Form)
                     Box(
                         modifier = Modifier
                             .size(46.dp)
@@ -276,7 +357,10 @@ private fun BottomNavBar(
                     NavButton(
                         item = item,
                         selected = currentRoute == item.route ||
-                            (item.route == Routes.LIST && currentRoute?.startsWith("detail") == true),
+                            (item.route == Routes.HOME &&
+                                (currentRoute?.startsWith("detail") == true ||
+                                    currentRoute == Routes.LIST ||
+                                    currentRoute == Routes.NEARBY)),
                         onClick = { onNavigate(item.route) }
                     )
                 }

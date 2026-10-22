@@ -17,7 +17,11 @@ UI Android mengikuti design web app asli secara detail:
 - Palet warna oranye `#F84F2F` + sky blue + latar `#E5ECF3` (konversi OKLCH dari `styles.css`)
 - Bottom nav pill melayang (HOME · MINE · + · ME · FITUR), kartu surface + ring tipis,
   pill status kursi ("FILLING FAST · 1 SEAT"), section label mono + garis tipis
-- 7 layar: Welcome, Discover/List, Detail, Form, My Games, Fitur Native (mockup), Profil
+- **10 layar**: Welcome, Register/Login, Home, Discover/List, **Nearby (fitur jarak GPS)**,
+  Detail, Form, My Games, Fitur Native (mockup), Profil
+- **Dark mode** + toggle manual (System/Light/Dark) di Profil → APPEARANCE
+- **Fitur jarak GPS**: peta mock dengan pin venue (jarak+bearing), radius 1–10 km,
+  zoom/recenter, daftar sesi terurut jarak (mock data, tanpa permission GPS)
 
 ## 🚀 Menjalankan versi Android
 

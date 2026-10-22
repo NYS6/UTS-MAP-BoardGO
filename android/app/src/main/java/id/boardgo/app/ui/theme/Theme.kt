@@ -46,25 +46,33 @@ private val LightColors = lightColorScheme(
     scrim = BoardGoColors.Foreground
 )
 
-/** Varian gelap (opsional) — tetap memakai token warna BoardGO. */
+/** Varian DARK (navy gelap) — mengikuti gaya glass/gelap web app. */
 private val DarkColors = darkColorScheme(
     primary = BoardGoColors.Primary,
     onPrimary = BoardGoColors.OnPrimary,
-    primaryContainer = BoardGoColors.OnPrimaryContainer,
-    onPrimaryContainer = BoardGoColors.PrimaryContainer,
-    secondary = BoardGoColors.SurfaceVariant,
-    onSecondary = BoardGoColors.Foreground,
-    tertiary = BoardGoColors.Sky,
-    onTertiary = BoardGoColors.OnPrimary,
-    background = BoardGoColors.Foreground,
-    onBackground = BoardGoColors.Surface,
-    surface = Color(0xFF111A28),
-    onSurface = BoardGoColors.Surface,
-    surfaceVariant = Color(0xFF1B2433),
-    onSurfaceVariant = BoardGoColors.MutedForeground,
-    outline = BoardGoColors.OutlineStrong,
-    error = BoardGoColors.Destructive,
-    onError = BoardGoColors.OnDestructive
+    primaryContainer = Color(0xFF4A1A0E),
+    onPrimaryContainer = Color(0xFFFFD9CE),
+    secondary = Color(0xFF1E293B),
+    onSecondary = Color(0xFFE8EEF7),
+    secondaryContainer = Color(0xFF24324A),
+    onSecondaryContainer = Color(0xFFC8D6E8),
+    tertiary = Color(0xFF6E9AE8),
+    onTertiary = Color(0xFF0B1B3A),
+    tertiaryContainer = Color(0xFF1E3A6B),
+    onTertiaryContainer = Color(0xFFD6E4FF),
+    background = BoardGoDark.Background,
+    onBackground = BoardGoDark.OnBackground,
+    surface = BoardGoDark.Surface,
+    onSurface = BoardGoDark.OnBackground,
+    surfaceVariant = BoardGoDark.SurfaceVariant,
+    onSurfaceVariant = BoardGoDark.OnSurfaceVariant,
+    outline = BoardGoDark.Outline,
+    outlineVariant = BoardGoDark.OutlineVariant,
+    error = Color(0xFFEF5350),
+    onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFF5A1B1B),
+    onErrorContainer = Color(0xFFFFD9D9),
+    scrim = Color.Black
 )
 
 @Composable
@@ -81,10 +89,14 @@ fun BoardGoTheme(
             // Android 15+ (API 35) membuat warna system bar jadi edge-to-edge otomatis.
             @Suppress("DEPRECATION")
             if (android.os.Build.VERSION.SDK_INT < 35) {
-                window.statusBarColor = BoardGoColors.SkyDeep.toArgb()
-                window.navigationBarColor = BoardGoColors.Surface.toArgb()
+                window.statusBarColor =
+                    (if (darkTheme) BoardGoDark.Background else BoardGoColors.SkyDeep).toArgb()
+                window.navigationBarColor = colorScheme.surface.toArgb()
             }
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
         }
     }
 

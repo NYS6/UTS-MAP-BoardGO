@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.boardgo.app.data.DummyData
+import id.boardgo.app.ui.components.BoardGoChip
 import id.boardgo.app.ui.components.BoardGoGhostButton
 import id.boardgo.app.ui.components.GameCover
 import id.boardgo.app.ui.components.PlayerAvatar
@@ -40,6 +41,7 @@ import id.boardgo.app.ui.components.SectionLabel
 import id.boardgo.app.ui.components.SkyBackdrop
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
+import id.boardgo.app.ui.viewmodel.ThemeMode
 
 /**
  * ========================== LAYAR PROFIL ==================================
@@ -56,6 +58,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.profileState.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val me = state.me
 
     Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -147,6 +150,34 @@ fun ProfileScreen(
                         text = "Log out",
                         onClick = onLogout,
                         modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // ---------- Appearance (toggle dark mode manual) ----------
+            item {
+                SectionLabel(
+                    text = "Appearance",
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    BoardGoChip(
+                        text = "System",
+                        selected = themeMode == ThemeMode.SYSTEM,
+                        onClick = { viewModel.onThemeModeChange(ThemeMode.SYSTEM) }
+                    )
+                    BoardGoChip(
+                        text = "Light",
+                        selected = themeMode == ThemeMode.LIGHT,
+                        onClick = { viewModel.onThemeModeChange(ThemeMode.LIGHT) }
+                    )
+                    BoardGoChip(
+                        text = "Dark",
+                        selected = themeMode == ThemeMode.DARK,
+                        onClick = { viewModel.onThemeModeChange(ThemeMode.DARK) }
                     )
                 }
             }

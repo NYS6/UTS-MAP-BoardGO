@@ -40,7 +40,9 @@ import id.boardgo.app.ui.theme.BoardGoColors
  */
 @Composable
 fun WelcomeScreen(
-    onStart: () -> Unit,
+    onCreateAccount: () -> Unit,
+    onLogin: () -> Unit,
+    onStart: () -> Unit,   // "skip — just browse"
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -110,7 +112,7 @@ fun WelcomeScreen(
 
             BoardGoPrimaryButton(
                 text = "Create account",
-                onClick = onStart, // mockup: tanpa backend
+                onClick = onCreateAccount, // -> layar Register ("GRAB A SEAT")
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -122,7 +124,7 @@ fun WelcomeScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
-                    .clickable(onClick = onStart)
+                    .clickable(onClick = onLogin) // -> layar Login ("WELCOME BACK")
                     .padding(vertical = 15.dp),
                 contentAlignment = Alignment.Center
             ) {

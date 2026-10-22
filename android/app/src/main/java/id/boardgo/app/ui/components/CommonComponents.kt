@@ -139,14 +139,16 @@ fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
     }
 }
 
-/** Top bar: judul selalu UPPERCASE Anton (sama seperti web app). */
+/** Top bar: judul UPPERCASE Anton; `light` = teks putih untuk latar sky. */
 @Composable
 fun TopBar(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
+    light: Boolean = false,
     trailing: @Composable (() -> Unit)? = null
 ) {
+    val fg = if (light) Color.White else MaterialTheme.colorScheme.onSurface
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -161,29 +163,75 @@ fun TopBar(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                    .background(if (light) Color.White.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surface)
+                    .border(
+                        1.dp,
+                        if (light) Color.White.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline,
+                        CircleShape
+                    )
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = fg
                 )
             }
         } else {
             Spacer(Modifier.width(38.dp))
         }
 
-        Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
+        if (title.isNotBlank()) {
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.headlineMedium,
+                color = fg,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            Spacer(Modifier.weight(1f))
+        }
 
         trailing?.invoke()
+    }
+}
+
+/** Tombol lingkaran "kaca" (untuk hero sky: bell, peta, dll). */
+@Composable
+fun GlassCircleButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    badge: Boolean = false
+) {
+    Box(modifier = modifier) {
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.25f))
+                .border(1.dp, Color.White.copy(alpha = 0.45f), CircleShape)
+        ) {
+            Icon(
+                icon,
+                contentDescription = contentDescription,
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        if (badge) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(9.dp)
+                    .clip(CircleShape)
+                    .background(BoardGoColors.Meeple)
+                    .border(1.5.dp, BoardGoColors.SkyDeep, CircleShape)
+            )
+        }
     }
 }
 
@@ -466,6 +514,78 @@ fun SuccessBanner(
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White
             )
+        }
+    }
+}
+
+/**
+ * Baris sesi ringkas (cover + nama Anton + mono meta + avatar + seat pill)
+ * — dipakai layar Home, Nearby, dan daftar sesi.
+ */
+@Composable
+fun SessionMiniRow(
+    session: id.boardgo.app.data.model.GameSession,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showKm: Boolean = false,
+    trailing: @Composable (() -> Unit)? = null
+) {
+    val game = DummyData.gameById(session.gameId)
+    val venue = DummyData.venueById(session.venueId)
+    val seatsLeft = session.maxPlayers - session.joinedPlayerIds.size
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GameCover(
+            gameId = session.gameId,
+            name = game?.name ?: "?",
+            modifier = Modifier.size(56.dp)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = (game?.name ?: "-").uppercase(),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = buildString {
+                    append(session.day.uppercase()); append(" · "); append(session.time)
+                    append(" · "); append(venue?.name ?: "-")
+                    if (showKm && venue != null) append(" · ${venue.distanceKm} KM")
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AvatarStack(playerIds = session.joinedPlayerIds, size = 22)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "${session.joinedPlayerIds.size}/${session.maxPlayers} PLAYERS",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        if (trailing != null) {
+            trailing()
+        } else {
+            SeatPill(seatsLeft = seatsLeft)
         }
     }
 }

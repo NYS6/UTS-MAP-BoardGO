@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SentimentDissatisfied
 import androidx.compose.material3.Icon
@@ -59,6 +60,7 @@ import id.boardgo.app.ui.viewmodel.LoadStatus
 fun GameListScreen(
     viewModel: BoardGOViewModel,
     onGameClick: (String) -> Unit,
+    onNearby: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.listState.collectAsStateWithLifecycle()
@@ -79,6 +81,18 @@ fun GameListScreen(
                     item {
                         Box {
                             SkyBackdrop(tall = true)
+
+                            // Tombol peta (-> layar Nearby / jarak GPS)
+                            id.boardgo.app.ui.components.GlassCircleButton(
+                                icon = Icons.Filled.Place,
+                                contentDescription = "Nearby map",
+                                onClick = onNearby,
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .statusBarsPadding()
+                                    .padding(end = 20.dp, top = 12.dp)
+                            )
+
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()

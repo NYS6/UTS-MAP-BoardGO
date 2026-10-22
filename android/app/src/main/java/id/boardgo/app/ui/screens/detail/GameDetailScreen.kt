@@ -211,6 +211,7 @@ fun GameDetailScreen(
                         items(state.sessions, key = { it.id }) { session ->
                             SessionCard(
                                 session = session,
+                                onJoin = { viewModel.joinSession(session.id) },
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                             )
                         }
@@ -305,12 +306,17 @@ private fun StatBlock(
     }
 }
 
-/** Kartu sesi (table) di layar detail — meniru web app. */
+/** Kartu sesi (table) di layar detail — meniru web app + tombol Join mockup. */
 @Composable
-private fun SessionCard(session: GameSession, modifier: Modifier = Modifier) {
+private fun SessionCard(
+    session: GameSession,
+    onJoin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val venue = DummyData.venueById(session.venueId)
     val host = DummyData.playerById(session.hostId)
     val seatsLeft = session.maxPlayers - session.joinedPlayerIds.size
+    val joined = id.boardgo.app.data.DummyData.CURRENT_USER_ID in session.joinedPlayerIds
 
     Column(
         modifier = modifier
@@ -354,6 +360,41 @@ private fun SessionCard(session: GameSession, modifier: Modifier = Modifier) {
             )
             Spacer(Modifier.weight(1f))
             InfoPill(text = session.fee)
+        }
+
+        // Aksi Join (mockup — state tersimpan di ViewModel)
+        if (joined) {
+            Spacer(Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(BoardGoColors.Success.copy(alpha = 0.12f))
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "✓ YOU'RE IN",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = BoardGoColors.Success
+                )
+            }
+        } else if (seatsLeft > 0) {
+            Spacer(Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable(onClick = onJoin)
+                    .padding(horizontal = 18.dp, vertical = 7.dp)
+            ) {
+                Text(
+                    text = "JOIN",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }

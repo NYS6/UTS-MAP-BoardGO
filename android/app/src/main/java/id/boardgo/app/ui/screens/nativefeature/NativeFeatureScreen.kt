@@ -111,7 +111,7 @@ fun NativeFeatureScreen(
                                     BoardGoChip(
                                         text = "$radius km",
                                         selected = state.nearbyRadiusKm == radius,
-                                        onClick = { viewModel.onNearbyRadiusChange(radius) }
+                                        onClick = { viewModel.onNativeRadiusChange(radius) }
                                     )
                                 }
                             }
