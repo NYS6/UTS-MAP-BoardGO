@@ -37,7 +37,7 @@ export function TopBar({ title, back, right, light }: { title?: string; back?: b
   return (
     <header className="relative z-10 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5 pt-6 pb-3">
       {back ? (
-        <button onClick={() => history.back()} aria-label="Back" className={cn("grid size-10 place-items-center rounded-full ring-1", light ? "bg-glass/25 ring-glass/40 text-primary-foreground backdrop-blur-md" : "bg-surface ring-border")}>
+        <button onClick={() => (history.length > 1 ? history.back() : window.location.assign("/home"))} aria-label="Back" className={cn("grid size-10 place-items-center rounded-full ring-1", light ? "bg-glass/25 ring-glass/40 text-primary-foreground backdrop-blur-md" : "bg-surface ring-border")}>
           <ChevronLeft className="size-5" />
         </button>
       ) : <span />}

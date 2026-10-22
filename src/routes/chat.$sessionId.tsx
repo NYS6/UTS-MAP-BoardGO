@@ -28,13 +28,13 @@ function Chat() {
     e.preventDefault();
     if (!text.trim()) return;
     send(sessionId, text.trim()); setText("");
-    const other = s?.playerIds.find((p) => p !== "me");
+    const others = s?.playerIds.filter((p) => p !== "me") ?? []; const other = others[Math.floor(Math.random() * others.length)];
     if (other) {
       setTyping(true);
       setTimeout(() => {
         setTyping(false);
         // simulated reply from another player
-        send(sessionId, `__from:${other}__${replies[Math.floor(Math.random() * replies.length)]}`);
+        send(sessionId, replies[Math.floor(Math.random() * replies.length)]!, other);
       }, 1400);
     }
   };
@@ -44,10 +44,10 @@ function Chat() {
 
   return (
     <Screen nav={false}>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-dvh flex-col">
         <TopBar back title={g.name} right={<Link to="/session/$id" params={{ id: s.id }} className="font-mono text-[11px] text-primary">info</Link>} />
         <p className="px-5 pb-3 font-mono text-[11px] text-muted-foreground">{s.playerIds.length} players · {s.day} {s.time}</p>
-        <div className="flex-1 space-y-3 px-5 pb-4">
+        <div className="flex-1 space-y-3 overflow-y-auto px-5 pb-4">
           {msgs.length === 0 && <p className="pt-10 text-center text-sm text-muted-foreground">Say hi to your table 👋</p>}
           {msgs.map((m) => {
             let from = m.from, body = m.text;
@@ -69,7 +69,7 @@ function Chat() {
           {typing && <p className="font-mono text-[11px] text-muted-foreground">someone is typing…</p>}
           <div ref={end} />
         </div>
-        <form onSubmit={submit} className="sticky bottom-0 flex gap-2 bg-background/90 px-4 py-3 backdrop-blur-xl">
+        <form onSubmit={submit} className="flex shrink-0 gap-2 bg-background/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
           <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Message the table" className="flex-1 rounded-full bg-surface px-4 py-3 text-sm ring-1 ring-border outline-none focus:ring-2 focus:ring-primary" />
           <button aria-label="Send" className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Send className="size-4" /></button>
         </form>

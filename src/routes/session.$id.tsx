@@ -72,7 +72,7 @@ function SessionDetail() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-20 mt-6 flex gap-3 bg-gradient-to-t from-background via-background to-transparent px-5 pt-6 pb-5">
+      <div className="sticky bottom-0 z-20 mt-6 flex gap-3 bg-gradient-to-t from-background via-background to-transparent px-5 pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         {past ? (
           <Link to="/rate/$sessionId" params={{ sessionId: s.id }} className={btn + " flex-1"}>Rate players</Link>
         ) : mine ? (
