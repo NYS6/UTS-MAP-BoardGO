@@ -107,6 +107,7 @@ class MainActivity : ComponentActivity() {
 | 8 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab **Upcoming / Hosting / Past** (Hosting = sesi yang kita host, hasil Publish juga masuk) |
 | 9 | **Chat Sesi** | `ui/screens/chat/ChatScreen.kt` | Bubble chat (masuk/keluar/sistem), input "Message the table", argumen `sessionId` |
 | 10 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, **toggle dark mode** (System/Light/Dark), log out |
+| 11 | **Notifications** | `ui/screens/notifications/NotificationsScreen.kt` | Daftar notifikasi + unread dot + "mark all read"; tap → chat/detail; push otomatis saat Join/Publish |
 
 ---
 
@@ -263,7 +264,8 @@ android/app/src/main/java/id/boardgo/
         ├── form/CreateSessionScreen.kt    // Form validasi angka & email
         ├── mygames/MyGamesScreen.kt       // Tab Upcoming/Hosting/Past
         ├── chat/ChatScreen.kt             // Chat sesi (bubble + input)
-        ├── profile/ProfileScreen.kt       // Profil & statistik
+        ├── notifications/NotificationsScreen.kt // Notifikasi + mark all read
+        └── profile/ProfileScreen.kt       // Profil & statistik
 res/
 ├── font/     // Anton + JetBrains Mono (font asli design web)
 └── drawable/ // 12 foto game game_*.jpg (asli dari repo web)

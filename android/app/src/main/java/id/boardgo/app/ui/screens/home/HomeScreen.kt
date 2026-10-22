@@ -61,9 +61,11 @@ fun HomeScreen(
     viewModel: BoardGOViewModel,
     onSeeAll: () -> Unit,
     onSessionClick: (String) -> Unit,
+    onNotifications: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.homeState.collectAsStateWithLifecycle()
+    val notifState by viewModel.notifState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (state.status) {
@@ -117,8 +119,8 @@ fun HomeScreen(
                                     GlassCircleButton(
                                         icon = Icons.Filled.Notifications,
                                         contentDescription = "Notifications",
-                                        onClick = { /* mockup */ },
-                                        badge = true
+                                        onClick = onNotifications,
+                                        badge = notifState.unreadCount > 0
                                     )
                                 }
 

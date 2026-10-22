@@ -151,6 +151,27 @@ data class ChatUiState(
     val messagesBySession: Map<String, List<ChatMessage>> = emptyMap()
 )
 
+/**
+ * Notifikasi aplikasi (meniru web app). Jika chatSessionId terisi -> buka chat;
+ * jika gameId terisi -> buka detail game.
+ */
+data class AppNotification(
+    val id: String,
+    val title: String,
+    val body: String,
+    val time: String,
+    val read: Boolean = false,
+    val chatSessionId: String? = null,
+    val gameId: String? = null
+)
+
+/** State layar Notifications. */
+data class NotifUiState(
+    val notifications: List<AppNotification> = emptyList()
+) {
+    val unreadCount: Int get() = notifications.count { !it.read }
+}
+
 /** Tab layar My Games. */
 enum class MyGamesTab { UPCOMING, HOSTING, PAST }
 
@@ -220,6 +241,47 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
+    // =================== State NOTIFIKASI ==================================
+    private val _notifState = MutableStateFlow(
+        NotifUiState(
+            notifications = listOf(
+                // Notifikasi awal (meniru web app)
+                AppNotification("n1", "Kevin replied in chat",
+                    "See you Saturday at Meeple House", "10m",
+                    chatSessionId = "s4"),
+                AppNotification("n2", "New Catan table nearby",
+                    "Coffee & Dice · Tonight 19:30 · 1 seat left", "1h",
+                    gameId = "catan"),
+                AppNotification("n3", "Rate your last game",
+                    "How was Catan at The Board Room?", "2d", read = true)
+            )
+        )
+    )
+    val notifState: StateFlow<NotifUiState> = _notifState.asStateFlow()
+
+    /** Tandai satu notifikasi sudah dibaca. */
+    fun markNotifRead(notifId: String) {
+        _notifState.update { state ->
+            state.copy(
+                notifications = state.notifications.map {
+                    if (it.id == notifId) it.copy(read = true) else it
+                }
+            )
+        }
+    }
+
+    /** Tandai semua notifikasi sudah dibaca. */
+    fun markAllNotifsRead() {
+        _notifState.update { state ->
+            state.copy(notifications = state.notifications.map { it.copy(read = true) })
+        }
+    }
+
+    /** Push notifikasi baru (kepala paling atas). */
+    private fun pushNotif(notif: AppNotification) {
+        _notifState.update { it.copy(notifications = listOf(notif) + it.notifications) }
+    }
+
     /** Join sesi (mockup) — memperbarui Home, My Games, Profil, Nearby, Chat. */
     fun joinSession(sessionId: String) {
         val alreadyJoined = _allSessions.value
@@ -265,6 +327,24 @@ class BoardGOViewModel : ViewModel() {
         loadMyGames()
         loadProfile()
         loadGameDetailQuiet()
+
+        // Push notifikasi join (meniru web app)
+        if (!alreadyJoined) {
+            val joinedNow = _allSessions.value.find { it.id == sessionId }
+                ?.joinedPlayerIds
+                ?.contains(DummyData.CURRENT_USER_ID) == true
+            if (joinedNow) {
+                pushNotif(
+                    AppNotification(
+                        id = "nj${System.currentTimeMillis()}",
+                        title = "You're in!",
+                        body = "Say hi to your table in chat.",
+                        time = "now",
+                        chatSessionId = sessionId
+                    )
+                )
+            }
+        }
     }
 
     // =================== State Home ========================================
@@ -512,6 +592,17 @@ class BoardGOViewModel : ViewModel() {
             _homeState.update { h -> h.copy(sessions = _allSessions.value) }
             loadMyGames()
             loadProfile()
+
+            // Push notifikasi publish (meniru web app)
+            pushNotif(
+                AppNotification(
+                    id = "np${System.currentTimeMillis()}",
+                    title = "Session published",
+                    body = "Players nearby can now join your table.",
+                    time = "now",
+                    gameId = form.gameId
+                )
+            )
 
             _formState.update {
                 it.copy(isSubmitting = false, isSubmitSuccess = true, createdSessionId = newId)

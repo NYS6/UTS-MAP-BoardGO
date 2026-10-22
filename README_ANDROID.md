@@ -21,8 +21,10 @@ UI Android mengikuti design web app asli secara detail:
 - Kartu surface + ring tipis, pill status kursi ("FILLING FAST · 1 SEAT"),
   section label mono + garis tipis
 - **Game utama: MAHJONG & MONOPOLY** (urutan depan, kartu featured, chip, favorit)
-- **10 layar**: Welcome, Register/Login, Home, Discover/List, Nearby (jarak GPS),
-  Detail, Form, My Games, **Chat sesi**, Profil — fitur QR & biometrik DIHAPUS
+- **11 layar**: Welcome, Register/Login, Home, Discover/List, Nearby (jarak GPS),
+  Detail, Form, My Games, **Chat sesi**, **Notifications**, Profil — QR & biometrik DIHAPUS
+- **Notifikasi**: layar Notifications (unread dot, "mark all read", tap → chat/detail),
+  push otomatis saat Join sesi & Publish tabel, badge di bel Home
 - **Dark mode** + toggle manual (System/Light/Dark) di Profil → APPEARANCE
 - **Fitur jarak GPS**: peta mock dengan pin venue (jarak+bearing), radius 1–10 km,
   zoom/recenter, daftar sesi terurut jarak (mock data, tanpa permission GPS)

@@ -46,6 +46,7 @@ import id.boardgo.app.ui.screens.home.HomeScreen
 import id.boardgo.app.ui.screens.list.GameListScreen
 import id.boardgo.app.ui.screens.mygames.MyGamesScreen
 import id.boardgo.app.ui.screens.nearby.NearbyScreen
+import id.boardgo.app.ui.screens.notifications.NotificationsScreen
 import id.boardgo.app.ui.screens.profile.ProfileScreen
 import id.boardgo.app.ui.screens.welcome.WelcomeScreen
 import id.boardgo.app.ui.theme.BoardGoColors
@@ -76,6 +77,7 @@ object Routes {
     const val DETAIL = "detail/{gameId}"
     const val CREATE = "create?gameId={gameId}"
     const val CHAT = "chat/{sessionId}"
+    const val NOTIFICATIONS = "notifications"
     const val MYGAMES = "mygames"
     const val PROFILE = "profile"
 
@@ -163,7 +165,8 @@ fun BoardGoNavHost(
                     onSeeAll = { navController.navigate(Routes.LIST) },
                     onSessionClick = { gameId ->
                         navController.navigate(Routes.detail(gameId))
-                    }
+                    },
+                    onNotifications = { navController.navigate(Routes.NOTIFICATIONS) }
                 )
             }
 
@@ -243,6 +246,20 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) },
                     onChat = { sessionId -> navController.navigate(Routes.chat(sessionId)) }
+                )
+            }
+
+            // ---------- NOTIFIKASI ----------
+            composable(Routes.NOTIFICATIONS) {
+                NotificationsScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onOpenChat = { sessionId ->
+                        navController.navigate(Routes.chat(sessionId))
+                    },
+                    onOpenGame = { gameId ->
+                        navController.navigate(Routes.detail(gameId))
+                    }
                 )
             }
 
