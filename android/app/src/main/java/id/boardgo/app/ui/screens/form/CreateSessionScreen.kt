@@ -49,14 +49,6 @@ import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
-/**
- * ======================= LAYAR FORM / INPUT ===============================
- * Meniru "Host a game" web app. VALIDASI (kriteria UTS):
- * - Jumlah pemain : KeyboardType.Number + filter digit + rentang 2–12
- * - Email kontak  : KeyboardType.Email + regex email
- * - Field wajib   : game & venue harus dipilih
- * =========================================================================
- */
 @Composable
 fun CreateSessionScreen(
     viewModel: BoardGOViewModel,
@@ -95,7 +87,7 @@ fun CreateSessionScreen(
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // ---------------- 1. Game ----------------
+
             SectionLabel(text = "1 · Pick a game")
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(DummyData.games, key = { it.id }) { game ->
@@ -108,7 +100,6 @@ fun CreateSessionScreen(
             }
             FieldError(message = state.gameIdError)
 
-            // ---------------- 2. Hari & jam ----------------
             SectionLabel(text = "2 · Day & time")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DummyData.dayOptions.forEach { day ->
@@ -130,7 +121,6 @@ fun CreateSessionScreen(
                 }
             }
 
-            // ---------------- 3. Venue ----------------
             SectionLabel(text = "3 · Pick a venue")
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DummyData.venues.forEach { venue ->
@@ -145,7 +135,6 @@ fun CreateSessionScreen(
             }
             FieldError(message = state.venueIdError)
 
-            // ---------------- 4. Jumlah pemain (ANGKA) ----------------
             SectionLabel(text = "4 · Max players")
             OutlinedTextField(
                 value = state.maxPlayers,
@@ -154,7 +143,7 @@ fun CreateSessionScreen(
                 label = { Text("Max players") },
                 placeholder = { Text("e.g. 4") },
                 singleLine = true,
-                // >>> KEYBOARD NUMBER + validasi hanya angka <<<
+
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
@@ -175,7 +164,6 @@ fun CreateSessionScreen(
                 )
             )
 
-            // ---------------- 5. Email (EMAIL) ----------------
             SectionLabel(text = "5 · Contact email")
             OutlinedTextField(
                 value = state.contactEmail,
@@ -184,7 +172,7 @@ fun CreateSessionScreen(
                 label = { Text("Email to reach players") },
                 placeholder = { Text("e.g. dimas@boardgo.id") },
                 singleLine = true,
-                // >>> KEYBOARD EMAIL + validasi regex email <<<
+
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -205,7 +193,6 @@ fun CreateSessionScreen(
                 )
             )
 
-            // ---------------- 6. Biaya ----------------
             SectionLabel(text = "6 · Table fee")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DummyData.feeOptions.forEach { fee ->
@@ -217,7 +204,6 @@ fun CreateSessionScreen(
                 }
             }
 
-            // ---------------- 7. Catatan ----------------
             SectionLabel(text = "7 · Notes (optional)")
             OutlinedTextField(
                 value = state.note,
@@ -240,7 +226,6 @@ fun CreateSessionScreen(
                 modifier = Modifier.align(Alignment.End)
             )
 
-            // ---------------- Ringkasan ----------------
             SectionLabel(text = "Summary")
             SummaryCard(
                 gameName = DummyData.gameById(state.gameId)?.name ?: "—",
@@ -251,7 +236,6 @@ fun CreateSessionScreen(
                 fee = state.fee
             )
 
-            // ---------------- Aksi ----------------
             Spacer(Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 BoardGoGhostButton(
@@ -269,13 +253,12 @@ fun CreateSessionScreen(
             Spacer(
                 Modifier
                     .navigationBarsPadding()
-                    .height(118.dp)   // ruang untuk bottom nav (92dp) + jarak aman
+                    .height(118.dp)
             )
         }
     }
 }
 
-/** Pesan error di bawah pilihan. */
 @Composable
 private fun FieldError(message: String?) {
     if (message != null) {
@@ -299,7 +282,6 @@ private fun FieldError(message: String?) {
     }
 }
 
-/** Opsi venue (kartu pilih). */
 @Composable
 private fun VenueOption(
     name: String,
@@ -348,7 +330,6 @@ private fun VenueOption(
     }
 }
 
-/** Kartu ringkasan. */
 @Composable
 private fun SummaryCard(
     gameName: String,
@@ -384,3 +365,4 @@ private fun SummaryCard(
         }
     }
 }
+

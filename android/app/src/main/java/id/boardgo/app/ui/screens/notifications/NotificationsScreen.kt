@@ -37,16 +37,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.AppNotification
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
-/**
- * ===================== LAYAR NOTIFICATIONS =================================
- * Meniru halaman notifikasi web app:
- *  - Daftar notifikasi (judul + isi + waktu), titik unread oranye
- *  - Aksi "mark all read" di top bar
- *  - Ketuk notifikasi -> tandai sudah dibaca + buka target
- *    (chat sesi / detail game) bila ada tautannya
- *  - Notifikasi baru ter-push saat Join sesi & Publish tabel
- * =========================================================================
- */
 @Composable
 fun NotificationsScreen(
     viewModel: BoardGOViewModel,
@@ -131,7 +121,6 @@ fun NotificationsScreen(
     }
 }
 
-/** Kartu notifikasi — unread diberi titik oranye + ring lembut. */
 @Composable
 private fun NotificationCard(
     notif: AppNotification,
@@ -155,7 +144,7 @@ private fun NotificationCard(
             .padding(14.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Titik unread
+
         Box(
             modifier = Modifier
                 .padding(top = 6.dp, end = 0.dp)
@@ -190,3 +179,4 @@ private fun NotificationCard(
         )
     }
 }
+

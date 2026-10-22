@@ -52,21 +52,6 @@ import id.boardgo.app.ui.screens.welcome.WelcomeScreen
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
-/**
- * ============================== NAVIGASI ==================================
- * Route:
- *  - "welcome"                : landing        (start destination)
- *  - "register" / "login"     : AuthForm (GRAB A SEAT / WELCOME BACK)
- *  - "home"                   : dashboard home ("FIND A TABLE IN 30 SEC")
- *  - "list"                   : Discover (LazyColumn daftar game)
- *  - "nearby"                 : FITUR JARAK GPS (peta mock + radius km)
- *  - "detail/{gameId}"        : Detail  << argumen gameId
- *  - "create?gameId={gameId}"  : Form (argumen opsional)
- *  - "mygames"                : My Games (Upcoming/Past)
- *  - "native"                 : Fitur native mockup
- *  - "profile"                : Profil (+ toggle dark mode, log out)
- * =========================================================================
- */
 object Routes {
     const val WELCOME = "welcome"
     const val REGISTER = "register"
@@ -96,7 +81,6 @@ fun BoardGoNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    // Layar tanpa bottom nav (landing, auth, chat)
     val hideBottomBar = currentRoute == null ||
         currentRoute == Routes.WELCOME ||
         currentRoute == Routes.REGISTER ||
@@ -113,7 +97,7 @@ fun BoardGoNavHost(
             startDestination = Routes.WELCOME,
             modifier = Modifier.fillMaxSize()
         ) {
-            // ---------- WELCOME ----------
+
             composable(Routes.WELCOME) {
                 WelcomeScreen(
                     onCreateAccount = { navController.navigate(Routes.REGISTER) },
@@ -126,7 +110,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- REGISTER ----------
             composable(Routes.REGISTER) {
                 AuthScreen(
                     isRegister = true,
@@ -142,7 +125,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- LOGIN ----------
             composable(Routes.LOGIN) {
                 AuthScreen(
                     isRegister = false,
@@ -158,7 +140,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- HOME ----------
             composable(Routes.HOME) {
                 HomeScreen(
                     viewModel = viewModel,
@@ -170,19 +151,17 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- DISCOVER (LIST) ----------
             composable(Routes.LIST) {
                 GameListScreen(
                     viewModel = viewModel,
                     onGameClick = { gameId ->
-                        // >>> PASSING ARGUMENT: gameId -> Detail <<<
+
                         navController.navigate(Routes.detail(gameId))
                     },
                     onNearby = { navController.navigate(Routes.NEARBY) }
                 )
             }
 
-            // ---------- NEARBY (FITUR JARAK GPS) ----------
             composable(Routes.NEARBY) {
                 NearbyScreen(
                     viewModel = viewModel,
@@ -195,7 +174,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- DETAIL (argumen gameId) ----------
             composable(
                 route = Routes.DETAIL,
                 arguments = listOf(navArgument("gameId") { type = NavType.StringType })
@@ -206,17 +184,16 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onCreateSession = { selectedGameId ->
-                        // >>> PASSING ARGUMENT: gameId -> Form <<<
+
                         navController.navigate(Routes.create(selectedGameId))
                     },
                     onOpenChat = { sessionId ->
-                        // >>> PASSING ARGUMENT: sessionId -> Chat <<<
+
                         navController.navigate(Routes.chat(sessionId))
                     }
                 )
             }
 
-            // ---------- FORM / INPUT ----------
             composable(
                 route = Routes.CREATE,
                 arguments = listOf(
@@ -240,7 +217,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- MY GAMES ----------
             composable(Routes.MYGAMES) {
                 MyGamesScreen(
                     viewModel = viewModel,
@@ -249,7 +225,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- NOTIFIKASI ----------
             composable(Routes.NOTIFICATIONS) {
                 NotificationsScreen(
                     viewModel = viewModel,
@@ -263,7 +238,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- CHAT SESI ----------
             composable(
                 route = Routes.CHAT,
                 arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
@@ -276,7 +250,6 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- PROFIL ----------
             composable(Routes.PROFILE) {
                 ProfileScreen(
                     viewModel = viewModel,
@@ -290,7 +263,6 @@ fun BoardGoNavHost(
             }
         }
 
-        // ---------- Bottom navigation (pill melayang) ----------
         if (!hideBottomBar) {
             BottomNavBar(
                 currentRoute = currentRoute,
@@ -310,21 +282,18 @@ fun BoardGoNavHost(
     }
 }
 
-/** Navigasi setelah auth sukses -> Home, bersihkan seluruh back stack. */
 private fun NavHostController.toHomeFromAuth() {
     navigate(Routes.HOME) {
         popUpTo(0) { inclusive = true }
     }
 }
 
-/** Item bottom nav. */
 private data class NavItem(
     val route: String,
     val label: String,
     val icon: ImageVector
 )
 
-/** Bottom bar pill melayang — meniru web app (HOME · FIND · + · MINE · ME). */
 @Composable
 private fun BottomNavBar(
     currentRoute: String?,
@@ -335,7 +304,7 @@ private fun BottomNavBar(
     val items = listOf(
         NavItem(Routes.HOME, "HOME", Icons.Filled.Home),
         NavItem(Routes.LIST, "FIND", Icons.Filled.Explore),
-        null, // tombol "+" (Host game)
+        null,
         NavItem(Routes.MYGAMES, "MINE", Icons.Filled.ViewAgenda),
         NavItem(Routes.PROFILE, "ME", Icons.Filled.Person)
     )
@@ -396,7 +365,6 @@ private fun BottomNavBar(
     }
 }
 
-/** Tombol nav: ikon + label mono; aktif = oranye + pill lembut. */
 @Composable
 private fun NavButton(
     item: NavItem,
@@ -431,3 +399,4 @@ private fun NavButton(
         )
     }
 }
+

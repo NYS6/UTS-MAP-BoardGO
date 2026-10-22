@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-# Skrip build helper BoardGO (Git Bash).
-# Di mesin LAIN: path di bawah tidak ada, script langsung pakai ./gradlew
-# dengan JAVA_HOME/SDK milik mesin tersebut.
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# --- Deteksi environment (hanya jika path-nya benar-benar ada) ---
 if [ -d "/c/Program Files/Android/Android Studio/jbr" ]; then
   export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
 fi

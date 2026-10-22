@@ -46,15 +46,6 @@ import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.ChatMessage
 
-/**
- * ========================== LAYAR CHAT ====================================
- * Meniru halaman chat sesi web app:
- *  - Header nama game + jumlah pemain & jadwal
- *  - Bubble chat: milik user di kanan, lawan di kiri (dengan nama + avatar),
- *    pesan sistem ("You joined the table 🎲") di tengah
- *  - Input "Message the table" + tombol kirim (mockup, state di ViewModel)
- * ========================================================================
- */
 @Composable
 fun ChatScreen(
     sessionId: String,
@@ -70,10 +61,9 @@ fun ChatScreen(
     val messages: List<ChatMessage> =
         chatState.messagesBySession[sessionId].orEmpty()
 
-    var input by remember { mutableStateOf("") }   // state input lokal
+    var input by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-    // Auto-scroll ke pesan terakhir
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
@@ -86,7 +76,7 @@ fun ChatScreen(
             .background(MaterialTheme.colorScheme.background)
             .imePadding()
     ) {
-        // ---------- Header ----------
+
         TopBar(title = game?.name ?: "Chat", onBack = onBack)
         if (session != null) {
             Text(
@@ -98,7 +88,6 @@ fun ChatScreen(
             Spacer(Modifier.height(8.dp))
         }
 
-        // ---------- Daftar pesan ----------
         if (messages.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -132,7 +121,6 @@ fun ChatScreen(
             }
         }
 
-        // ---------- Input pesan ----------
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -184,7 +172,6 @@ fun ChatScreen(
     }
 }
 
-/** Bubble milik user (kanan, oranye). */
 @Composable
 private fun OwnBubble(text: String, time: String) {
     Row(
@@ -211,7 +198,6 @@ private fun OwnBubble(text: String, time: String) {
     }
 }
 
-/** Bubble lawan bicara (kiri, dengan avatar & nama). */
 @Composable
 private fun OtherBubble(message: ChatMessage) {
     val sender = DummyData.playerById(message.senderId)
@@ -247,7 +233,6 @@ private fun OtherBubble(message: ChatMessage) {
     }
 }
 
-/** Pesan sistem (tengah, pill). */
 @Composable
 private fun SystemBubble(text: String) {
     Box(
@@ -269,3 +254,4 @@ private fun SystemBubble(text: String) {
         }
     }
 }
+

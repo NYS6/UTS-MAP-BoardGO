@@ -47,16 +47,6 @@ import id.boardgo.app.ui.components.SkyBackdrop
 import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
-/**
- * ================== LAYAR REGISTER / LOGIN (AuthForm) =====================
- * Meniru AuthForm web app — REVISI layout:
- *  - Judul "GRAB A SEAT"/"WELCOME BACK" berada DI ATAS sky backdrop
- *    (overlay, bukan di bawahnya) sehingga tidak menyatu dengan background
- *    light mode maupun dark mode.
- *  - Konten tidak terlalu bawah: judul + kartu langsung setelah top bar.
- * VALIDASI: nama wajib, email regex, password min 6 + toggle lihat password.
- * =========================================================================
- */
 @Composable
 fun AuthScreen(
     isRegister: Boolean,
@@ -67,12 +57,10 @@ fun AuthScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.authState.collectAsStateWithLifecycle()
-    var passwordVisible by remember { mutableStateOf(false) } // state lokal UI
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // Reset form saat pindah antar register/login
     LaunchedEffect(isRegister) { viewModel.resetAuth() }
 
-    // Navigasi setelah submit sukses (successTick naik)
     LaunchedEffect(state.successTick) {
         if (state.successTick > 0) {
             onSuccess()
@@ -86,10 +74,9 @@ fun AuthScreen(
             .background(MaterialTheme.colorScheme.background)
             .imePadding()
     ) {
-        // Sky backdrop di belakang konten bagian atas (overlay)
+
         SkyBackdrop(modifier = Modifier.fillMaxWidth().height(340.dp), tall = true)
 
-        // Konten menumpuk di atas backdrop, bisa di-scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +84,6 @@ fun AuthScreen(
         ) {
             TopBar(title = "", onBack = onBack, light = true)
 
-            // Judul display — berada tepat di area sky (putih menonjol)
             Text(
                 text = if (isRegister) "GRAB A\nSEAT" else "WELCOME\nBACK",
                 style = MaterialTheme.typography.displayLarge,
@@ -107,7 +93,6 @@ fun AuthScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Kartu form (putih/surface — kontras di light & dark mode)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,7 +144,7 @@ fun AuthScreen(
                             else Color.Transparent
                         )
                     },
-                    // >>> keyboard EMAIL <<<
+
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     shape = RoundedCornerShape(16.dp),
                     colors = fieldColors()
@@ -181,7 +166,7 @@ fun AuthScreen(
                             else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
-                    // >>> keyboard password + toggle lihat <<<
+
                     visualTransformation = if (passwordVisible)
                         VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -207,7 +192,6 @@ fun AuthScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Tombol Google (mockup)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -228,7 +212,6 @@ fun AuthScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Ganti mode auth
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -265,3 +248,4 @@ private fun fieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor = MaterialTheme.colorScheme.outline
 )
+

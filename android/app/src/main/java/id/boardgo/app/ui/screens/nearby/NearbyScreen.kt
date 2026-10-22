@@ -59,16 +59,6 @@ import id.boardgo.app.ui.viewmodel.MAP_KM
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * =================== LAYAR NEARBY — FITUR JARAK GPS =======================
- * Meniru /nearby web app (mock — tanpa GPS asli):
- *  - Peta stylized digambar lokal (jalan, sungai, taman)
- *  - Pin venue diposisikan dari jarak (km) + bearing, seperti proyeksi web
- *  - Lingkaran radius pencarian + chip radius [1..10] km
- *  - Zoom + recenter (mockup kontrol peta)
- *  - Kartu venue terpilih + daftar sesi terurut jarak dengan badge km
- * =========================================================================
- */
 @Composable
 fun NearbyScreen(
     viewModel: BoardGOViewModel,
@@ -79,7 +69,6 @@ fun NearbyScreen(
     val state by viewModel.nearbyState.collectAsStateWithLifecycle()
     val radius = state.radiusKm
 
-    // Sesi dalam radius (reaktif terhadap semua state yang dipakai)
     val sessions = viewModel.nearbySessions(radius)
     val liveVenueIds = sessions.map { it.venueId }.toSet()
     val countsByVenue = sessions.groupingBy { it.venueId }.eachCount()
@@ -121,7 +110,6 @@ fun NearbyScreen(
             )
         }
 
-        // ---------------- Peta mock (jarak GPS) ----------------
         item {
             BoxWithConstraints(
                 modifier = Modifier
@@ -135,11 +123,9 @@ fun NearbyScreen(
                 val mapH = constraints.maxHeight.toFloat()
                 val dark = MaterialTheme.colorScheme.background == BoardGoDark.Background
 
-                // Warna peta di-hoist di luar Canvas (DrawScope bukan konteks composable)
                 val mapBg = if (dark) Color(0xFF16233A) else MaterialTheme.colorScheme.secondary
                 val streetColor = if (dark) Color(0xFF26364F) else MaterialTheme.colorScheme.surface
 
-                // Latar peta (jalan/sungai/taman) digambar dengan Canvas
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val bg = mapBg
                     val street = streetColor
@@ -149,14 +135,13 @@ fun NearbyScreen(
 
                     drawRect(color = bg)
 
-                    // Sungai di bawah peta (kurva bezier kubik)
                     val river = androidx.compose.ui.graphics.Path().apply {
                         val w = size.width
                         val h = size.height
                         moveTo(0f, h * 0.78f)
-                        // kurva 1 (P0 -> P1, kontrol C)
+
                         cubicTo(w * 0.20f, h * 0.89f, w * 0.40f, h * 0.91f, w * 0.55f, h * 0.80f)
-                        // kurva 2
+
                         cubicTo(w * 0.72f, h * 0.71f, w * 0.86f, h * 0.69f, w, h * 0.76f)
                         lineTo(w, h)
                         lineTo(0f, h)
@@ -164,7 +149,6 @@ fun NearbyScreen(
                     }
                     drawPath(river, color = sky.copy(alpha = 0.35f))
 
-                    // Taman
                     drawRoundRect(
                         color = green.copy(alpha = 0.22f),
                         topLeft = Offset(size.width * 0.08f, size.height * 0.10f),
@@ -183,7 +167,6 @@ fun NearbyScreen(
                         center = Offset(size.width * 0.30f, size.height * 0.58f)
                     )
 
-                    // Jalan utama
                     val mainW = size.width * 0.03f
                     drawLine(
                         street, Offset(0f, size.height * 0.5f),
@@ -193,7 +176,7 @@ fun NearbyScreen(
                         street, Offset(size.width * 0.5f, 0f),
                         Offset(size.width * 0.5f, size.height), strokeWidth = mainW
                     )
-                    // Jalan diagonal
+
                     drawLine(
                         street, Offset(0f, size.height * 0.15f),
                         Offset(size.width, size.height * 0.65f), strokeWidth = size.width * 0.022f
@@ -202,7 +185,7 @@ fun NearbyScreen(
                         street, Offset(size.width * 0.1f, size.height),
                         Offset(size.width * 0.9f, 0f), strokeWidth = size.width * 0.022f
                     )
-                    // Jalan sekunder
+
                     listOf(0.20, 0.35, 0.65, 0.80).forEach { v ->
                         drawLine(
                             street, Offset(0f, size.height * v.toFloat()),
@@ -217,7 +200,7 @@ fun NearbyScreen(
                             strokeWidth = size.width * 0.01f
                         )
                     }
-                    // Sumbu tengah (meeple) — menandai posisi "Anda"
+
                     drawLine(
                         meeple.copy(alpha = 0.6f), Offset(0f, size.height * 0.5f),
                         Offset(size.width, size.height * 0.5f), strokeWidth = size.width * 0.006f
@@ -228,7 +211,6 @@ fun NearbyScreen(
                     )
                 }
 
-                // Konten peta (zoom diterapkan sebagai scale)
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -237,7 +219,7 @@ fun NearbyScreen(
                             scaleY = state.zoom
                         }
                 ) {
-                    // Lingkaran radius pencarian
+
                     val radiusFraction = (state.radiusPct * 2 / 100f).coerceAtMost(1f)
                     Box(
                         modifier = Modifier
@@ -252,7 +234,6 @@ fun NearbyScreen(
                             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f))
                     )
 
-                    // Pin venue (proyeksi jarak + bearing, seperti web app)
                     DummyData.venues.forEach { venue ->
                         VenuePin(
                             venue = venue,
@@ -267,7 +248,6 @@ fun NearbyScreen(
                         )
                     }
 
-                    // Titik "Anda" di tengah
                     Box(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -286,7 +266,6 @@ fun NearbyScreen(
                     )
                 }
 
-                // ---- Kontrol peta (mockup zoom & recenter) ----
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -337,7 +316,6 @@ fun NearbyScreen(
                     )
                 }
 
-                // Badge pojok kiri bawah
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -354,7 +332,6 @@ fun NearbyScreen(
                     )
                 }
 
-                // Hint recenter
                 if (state.hint != null) {
                     Box(
                         modifier = Modifier
@@ -374,7 +351,6 @@ fun NearbyScreen(
             }
         }
 
-        // ---------------- Chip radius jarak ----------------
         item {
             SectionLabel(
                 text = "Distance from you",
@@ -394,7 +370,6 @@ fun NearbyScreen(
             }
         }
 
-        // ---------------- Venue terpilih / daftar sesi ----------------
         val pickedId = state.pickedVenueId
         if (pickedId != null) {
             val venue = DummyData.venueById(pickedId)
@@ -478,7 +453,7 @@ fun NearbyScreen(
                             showKm = true,
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)
                         )
-                        // Badge jarak (seperti web app)
+
                         Box(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
@@ -500,7 +475,6 @@ fun NearbyScreen(
     }
 }
 
-/** Pin venue (diposisikan dari jarak & bearing — proyeksi sama dengan web). */
 @Composable
 private fun androidx.compose.foundation.layout.BoxScope.VenuePin(
     venue: Venue,
@@ -511,10 +485,10 @@ private fun androidx.compose.foundation.layout.BoxScope.VenuePin(
     mapH: Float,
     onClick: () -> Unit
 ) {
-    val r = (venue.distanceKm / MAP_KM) * 100.0          // % dari radius peta
+    val r = (venue.distanceKm / MAP_KM) * 100.0
     val a = Math.toRadians(venue.bearing)
-    val xPct = 50 + r * sin(a)                            // % posisi horizontal
-    val yPct = 50 - r * cos(a)                            // % posisi vertikal
+    val xPct = 50 + r * sin(a)
+    val yPct = 50 - r * cos(a)
 
     val bgColor = when {
         picked -> MaterialTheme.colorScheme.onSurface
@@ -547,3 +521,4 @@ private fun androidx.compose.foundation.layout.BoxScope.VenuePin(
         )
     }
 }
+

@@ -49,13 +49,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.LoadStatus
 
-/**
- * ============ LAYAR LIST / DISCOVER (LazyColumn) ===========================
- * Meniru layar Discover pada web app: hero slogan, search, filter kategori,
- * daftar kartu dengan cover foto game asli.
- * Klik item -> navigasi ke Detail dengan gameId sebagai argumen.
- * ==========================================================================
- */
 @Composable
 fun GameListScreen(
     viewModel: BoardGOViewModel,
@@ -77,12 +70,11 @@ fun GameListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 130.dp)
                 ) {
-                    // ---------- Hero ----------
+
                     item {
                         Box {
                             SkyBackdrop(tall = true)
 
-                            // Tombol peta (-> layar Nearby / jarak GPS)
                             id.boardgo.app.ui.components.GlassCircleButton(
                                 icon = Icons.Filled.Place,
                                 contentDescription = "Nearby map",
@@ -120,7 +112,6 @@ fun GameListScreen(
                         }
                     }
 
-                    // ---------- Search ----------
                     item {
                         OutlinedTextField(
                             value = state.searchQuery,
@@ -149,7 +140,6 @@ fun GameListScreen(
                         )
                     }
 
-                    // ---------- Filter kategori ----------
                     item {
                         SectionLabel(
                             text = "Category",
@@ -172,7 +162,6 @@ fun GameListScreen(
                         }
                     }
 
-                    // ---------- Daftar game ----------
                     item {
                         SectionLabel(
                             text = "${state.filteredGames.size} games found",
@@ -205,7 +194,6 @@ fun GameListScreen(
     }
 }
 
-/** Satu baris kartu game (cover foto + nama Anton uppercase + meta mono). */
 @Composable
 fun GameListItem(
     game: Game,
@@ -260,7 +248,6 @@ fun GameListItem(
     }
 }
 
-/** Tampilan saat filter kosong. */
 @Composable
 fun EmptyState(
     message: String,
@@ -284,3 +271,4 @@ fun EmptyState(
         )
     }
 }
+

@@ -12,12 +12,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-/**
- * Theme Material 3 CUSTOM BoardGO.
- * Sengaja tidak memakai MaterialTheme() bawaan Android Studio —
- * seluruh warna/tipografi/shape didefinisikan manual di package ui.theme.
- */
-
 private val LightColors = lightColorScheme(
     primary = BoardGoColors.Primary,
     onPrimary = BoardGoColors.OnPrimary,
@@ -46,7 +40,6 @@ private val LightColors = lightColorScheme(
     scrim = BoardGoColors.Foreground
 )
 
-/** Varian DARK (navy gelap) — mengikuti gaya glass/gelap web app. */
 private val DarkColors = darkColorScheme(
     primary = BoardGoColors.Primary,
     onPrimary = BoardGoColors.OnPrimary,
@@ -86,7 +79,7 @@ fun BoardGoTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            // Android 15+ (API 35) membuat warna system bar jadi edge-to-edge otomatis.
+
             @Suppress("DEPRECATION")
             if (android.os.Build.VERSION.SDK_INT < 35) {
                 window.statusBarColor =
@@ -107,3 +100,4 @@ fun BoardGoTheme(
         content = content
     )
 }
+

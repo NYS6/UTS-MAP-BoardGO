@@ -5,10 +5,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Unit test sederhana untuk logika validasi form (MVVM).
- * Menjalankan: ./gradlew testDebugUnitTest
- */
 class ValidasiFormTest {
 
     @Test
@@ -19,9 +15,10 @@ class ValidasiFormTest {
 
     @Test
     fun emailTidakValid_ditolak() {
-        assertFalse(BoardGOViewModel.isValidEmail("dimas@boardgo"))   // tanpa TLD
-        assertFalse(BoardGOViewModel.isValidEmail("dimas@"))          // tanpa domain
-        assertFalse(BoardGOViewModel.isValidEmail("dimas.boardgo.id"))// tanpa @
-        assertFalse(BoardGOViewModel.isValidEmail(""))                // kosong
+        assertFalse(BoardGOViewModel.isValidEmail("dimas@boardgo"))
+        assertFalse(BoardGOViewModel.isValidEmail("dimas@"))
+        assertFalse(BoardGOViewModel.isValidEmail("dimas.boardgo.id"))
+        assertFalse(BoardGOViewModel.isValidEmail(""))
     }
 }
+

@@ -54,13 +54,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.LoadStatus
 
-/**
- * ====================== LAYAR DETAIL GAME =================================
- * Meniru session detail web app: cover foto besar, nama Anton uppercase,
- * stat blocks (players / time / difficulty), sesi + seat pill + pemain.
- * Menerima ARGUMEN "gameId" dari layar List.
- * =========================================================================
- */
 @Composable
 fun GameDetailScreen(
     gameId: String,
@@ -90,7 +83,7 @@ fun GameDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 200.dp)
                 ) {
-                    // ---------- Cover besar ----------
+
                     item {
                         Box {
                             GameCover(
@@ -100,7 +93,7 @@ fun GameDetailScreen(
                                     .fillMaxWidth()
                                     .height(250.dp)
                             )
-                            // Scrim gradasi agar tombol back terbaca
+
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -115,7 +108,6 @@ fun GameDetailScreen(
                         }
                     }
 
-                    // ---------- Judul + favorit ----------
                     item {
                         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -148,7 +140,6 @@ fun GameDetailScreen(
                         }
                     }
 
-                    // ---------- Stat blocks ----------
                     item {
                         Row(
                             modifier = Modifier
@@ -177,7 +168,6 @@ fun GameDetailScreen(
                         }
                     }
 
-                    // ---------- Deskripsi ----------
                     item {
                         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                             Text(
@@ -188,7 +178,6 @@ fun GameDetailScreen(
                         }
                     }
 
-                    // ---------- Sesi tersedia ----------
                     item {
                         SectionLabel(
                             text = "Tables available (${state.sessions.size})",
@@ -220,7 +209,6 @@ fun GameDetailScreen(
                     }
                 }
 
-                // ---------- Tombol aksi (di atas bottom nav) ----------
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -247,7 +235,6 @@ fun GameDetailScreen(
                     }
                 }
 
-                // ---------- Tombol back mengambang ----------
                 Box(
                     modifier = Modifier
                         .statusBarsPadding()
@@ -269,10 +256,8 @@ fun GameDetailScreen(
     }
 }
 
-/** Bentuk lingkaran untuk tombol back. */
 private val CircleShapeRounded = RoundedCornerShape(50)
 
-/** Stat block: ikon + nilai besar + label mono. */
 @Composable
 private fun StatBlock(
     icon: ImageVector,
@@ -308,7 +293,6 @@ private fun StatBlock(
     }
 }
 
-/** Kartu sesi (table) di layar detail — meniru web app + Join & Open chat. */
 @Composable
 private fun SessionCard(
     session: GameSession,
@@ -365,7 +349,6 @@ private fun SessionCard(
             InfoPill(text = session.fee)
         }
 
-        // Aksi Join (mockup — state tersimpan di ViewModel) + buka chat
         if (joined) {
             Spacer(Modifier.height(10.dp))
             Box(
@@ -400,7 +383,6 @@ private fun SessionCard(
             }
         }
 
-        // Buka chat sesi
         Spacer(Modifier.height(8.dp))
         Text(
             text = "open chat →",
@@ -414,3 +396,4 @@ private fun SessionCard(
         )
     }
 }
+

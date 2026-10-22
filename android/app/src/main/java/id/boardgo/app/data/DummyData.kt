@@ -8,17 +8,8 @@ import id.boardgo.app.data.model.Level
 import id.boardgo.app.data.model.Player
 import id.boardgo.app.data.model.Venue
 
-/**
- * Seluruh data DUMMY (tanpa backend/database). Data di-porting dari
- * src/lib/data.ts pada web app BoardGO.
- */
-
 object DummyData {
 
-    // ---------------------------------------------------------------------
-    // Katalog game — MAHJONG & MONOPOLY di urutan depan sebagai GAME UTAMA
-    // (paling populer), sesuai permintaan revisi.
-    // ---------------------------------------------------------------------
     val featuredGameIds = listOf("mahjong", "monopoly")
 
     val games: List<Game> = listOf(
@@ -36,9 +27,6 @@ object DummyData {
         Game("werewolf", "Werewolf", "A big-group party game of bluffing, deduction and dramatic accusations.", "6–15", "45 min", Difficulty.EASY, Category.PARTY)
     )
 
-    // ---------------------------------------------------------------------
-    // Venue (mockup GPS: distanceKm dipakai untuk radius pencarian)
-    // ---------------------------------------------------------------------
     val venues: List<Venue> = listOf(
         Venue("v1", "Coffee & Dice", "BSD", 0.6, 40.0),
         Venue("v2", "The Board Room", "Gading Serpong", 1.4, 250.0),
@@ -50,9 +38,6 @@ object DummyData {
         Venue("v8", "Pavilion Games", "Bintaro", 4.3, 75.0)
     )
 
-    // ---------------------------------------------------------------------
-    // Pemain
-    // ---------------------------------------------------------------------
     const val CURRENT_USER_ID = "me"
 
     val players: List<Player> = listOf(
@@ -64,10 +49,6 @@ object DummyData {
         Player("u5", "Bima Santoso", 1, "Tangerang Selatan", "Ticket to Ride world traveler.", 4.5, 37, Level.CASUAL)
     )
 
-    // ---------------------------------------------------------------------
-    // Sesi bermain (s8 mahjong & s11 monopoly = sesi utama;
-    // s7 = sesi lampau untuk tab Past di My Games)
-    // ---------------------------------------------------------------------
     val sessions: List<GameSession> = listOf(
         GameSession("s8", "mahjong", "v1", "u4", "Tomorrow", "19:00", 4, listOf("u4", "u1"), Level.CASUAL, "Hong Kong rules, we'll teach scoring.", "Free"),
         GameSession("s11", "monopoly", "v8", "u5", "Sat", "14:00", 6, listOf("u5", "u1", "u4"), Level.CASUAL, "House rules: Free Parking jackpot.", "Rp20k"),
@@ -82,29 +63,23 @@ object DummyData {
         GameSession("s12", "werewolf", "v6", "u1", "Sat", "19:00", 10, listOf("u1", "u2", "u4", "u5"), Level.BEGINNER, "Big group night, moderator provided.", "Rp10k"),
         GameSession("s13", "scrabble", "v3", "u4", "Sun", "16:00", 4, listOf("u4"), Level.CASUAL, "English dictionary, timer optional.", "Free"),
         GameSession("s7", "catan", "v2", "me", "Last Fri", "19:00", 4, listOf("me", "u1", "u2", "u4"), Level.CASUAL, "Done! Great games.", "Free"),
-        // Sesi yang DI-HOST oleh user saat ini (muncul di tab Hosting di My Games)
+
         GameSession("s14", "monopoly", "v7", "me", "Sun", "15:00", 5, listOf("me", "u2"), Level.CASUAL, "Sunday family rules — Free Parking jackpot!", "Free")
     )
 
-    /** Sesi yang sudah lewat (untuk tab "Past" di My Games). */
     val pastSessionIds: Set<String> = setOf("s7")
 
-    // Opsi form
     val dayOptions = listOf("Tonight", "Tomorrow", "Sat", "Sun")
     val timeOptions = listOf("13:00", "16:00", "18:00", "19:30", "21:00")
     val feeOptions = listOf("Free", "Rp15k", "Rp25k", "Rp30k")
 
-    // Warna avatar pemain p1–p4
     val playerColors = listOf(0xFFC07C56, 0xFF4B8A63, 0xFF557CAF, 0xFFA864A2)
 
-    // ---------------------------------------------------------------------
-    // Helper lookup
-    // ---------------------------------------------------------------------
     fun gameById(id: String): Game? = games.find { it.id == id }
     fun venueById(id: String): Venue? = venues.find { it.id == id }
     fun playerById(id: String): Player? = players.find { it.id == id }
 
-    /** Sesi AKTIF (belum lewat) untuk sebuah game. */
     fun sessionsForGame(gameId: String): List<GameSession> =
         sessions.filter { it.gameId == gameId && it.id !in pastSessionIds }
 }
+

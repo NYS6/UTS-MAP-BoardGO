@@ -38,12 +38,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.MyGamesTab
 
-/**
- * ====================== LAYAR MY GAMES ====================================
- * Meniru tab MINE web app: tab Upcoming / Past + daftar sesi (LazyColumn)
- * dengan cover foto, nama game Anton, venue, seat pill, dan link chat.
- * =========================================================================
- */
 @Composable
 fun MyGamesScreen(
     viewModel: BoardGOViewModel,
@@ -63,7 +57,6 @@ fun MyGamesScreen(
                 TopBar(title = "My games")
             }
 
-            // ---------- Tab Upcoming / Hosting / Past ----------
             item {
                 Row(
                     modifier = Modifier
@@ -125,7 +118,6 @@ fun MyGamesScreen(
     }
 }
 
-/** Pill tab. */
 @Composable
 private fun TabPill(
     text: String,
@@ -157,7 +149,6 @@ private fun TabPill(
     }
 }
 
-/** Baris sesi (cover + info + seat pill / label host + link chat). */
 @Composable
 private fun SessionRow(
     session: GameSession,
@@ -224,7 +215,7 @@ private fun SessionRow(
         }
         if (!past) {
             if (hosting) {
-                // Label khusus sesi yang kita host
+
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
@@ -245,3 +236,4 @@ private fun SessionRow(
         }
     }
 }
+

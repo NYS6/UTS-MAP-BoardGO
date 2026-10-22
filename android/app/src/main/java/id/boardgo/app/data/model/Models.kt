@@ -1,12 +1,5 @@
 package id.boardgo.app.data.model
 
-/**
- * Model data BoardGO — di-porting 1:1 dari model di web app
- * (src/lib/data.ts). Semua data di aplikasi ini adalah DUMMY,
- * tidak ada backend/Room/database sungguhan.
- */
-
-/** Kategori board game (dipakai sebagai filter di layar List). */
 enum class Category(val label: String) {
     STRATEGY("Strategy"),
     FAMILY("Family"),
@@ -22,14 +15,12 @@ enum class Difficulty(val label: String) {
     HARD("Hard")
 }
 
-/** Level pemain saat sesi bermain. */
 enum class Level(val label: String) {
     BEGINNER("Beginner"),
     CASUAL("Casual"),
     COMPETITIVE("Competitive")
 }
 
-/** Item utama katalog. */
 data class Game(
     val id: String,
     val name: String,
@@ -40,7 +31,6 @@ data class Game(
     val category: Category
 )
 
-/** Venue/café tempat sesi bermain; distance (km) dipakai mockup GPS. */
 data class Venue(
     val id: String,
     val name: String,
@@ -49,7 +39,6 @@ data class Venue(
     val bearing: Double
 )
 
-/** Profil pemain. */
 data class Player(
     val id: String,
     val name: String,
@@ -61,7 +50,6 @@ data class Player(
     val level: Level
 )
 
-/** Sesi bermain (tabel) — dibuat via layar Form. */
 data class GameSession(
     val id: String,
     val gameId: String,
@@ -75,3 +63,4 @@ data class GameSession(
     val note: String,
     val fee: String
 )
+

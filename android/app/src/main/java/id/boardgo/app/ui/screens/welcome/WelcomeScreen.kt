@@ -30,19 +30,11 @@ import id.boardgo.app.ui.components.BoardGoPrimaryButton
 import id.boardgo.app.ui.components.SkyBackdrop
 import id.boardgo.app.ui.theme.BoardGoColors
 
-/**
- * =================== LAYAR WELCOME / LANDING ==============================
- * Meniru landing screen web app:
- * "FIND PEOPLE. FIND GAMES. PLAY TOGETHER." + foto papan Catan +
- * tombol Create account / I already have an account / skip.
- * Semua aksi menuju layar List (autentikasi dummy).
- * ========================================================================
- */
 @Composable
 fun WelcomeScreen(
     onCreateAccount: () -> Unit,
     onLogin: () -> Unit,
-    onStart: () -> Unit,   // "skip — just browse"
+    onStart: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -50,7 +42,7 @@ fun WelcomeScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Latar sky penuh bagian atas
+
         SkyBackdrop(modifier = Modifier.fillMaxWidth().height(560.dp), tall = true)
 
         Column(
@@ -70,7 +62,6 @@ fun WelcomeScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Slogan display (putih + oranye, seperti design asli)
             Text(
                 text = "FIND PEOPLE.",
                 style = MaterialTheme.typography.displayLarge,
@@ -92,7 +83,6 @@ fun WelcomeScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // Foto papan Monopoly (game utama) dari repo web
             Image(
                 painter = painterResource(R.drawable.game_monopoly),
                 contentDescription = "Catan board",
@@ -112,7 +102,7 @@ fun WelcomeScreen(
 
             BoardGoPrimaryButton(
                 text = "Create account",
-                onClick = onCreateAccount, // -> layar Register ("GRAB A SEAT")
+                onClick = onCreateAccount,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -124,7 +114,7 @@ fun WelcomeScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
-                    .clickable(onClick = onLogin) // -> layar Login ("WELCOME BACK")
+                    .clickable(onClick = onLogin)
                     .padding(vertical = 15.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -151,3 +141,4 @@ fun WelcomeScreen(
         }
     }
 }
+

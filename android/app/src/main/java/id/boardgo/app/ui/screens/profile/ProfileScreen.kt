@@ -43,13 +43,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.ThemeMode
 
-/**
- * ========================== LAYAR PROFIL ==================================
- * Meniru layar ME pada web app: avatar bulat + nama Anton uppercase,
- * stat card (rating / games / favorites), bio, tombol Edit & Log out,
- * daftar Favorite Games.
- * =========================================================================
- */
 @Composable
 fun ProfileScreen(
     viewModel: BoardGOViewModel,
@@ -66,7 +59,7 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 130.dp)
         ) {
-            // ---------- Header hero ----------
+
             item {
                 Box {
                     SkyBackdrop(tall = true)
@@ -105,7 +98,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ---------- Stat card ----------
             item {
                 Row(
                     modifier = Modifier
@@ -119,7 +111,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ---------- Bio ----------
             item {
                 Text(
                     text = me?.bio ?: "-",
@@ -133,7 +124,6 @@ fun ProfileScreen(
                 )
             }
 
-            // ---------- Tombol aksi ----------
             item {
                 Row(
                     modifier = Modifier
@@ -143,7 +133,7 @@ fun ProfileScreen(
                 ) {
                     BoardGoGhostButton(
                         text = "Edit profile",
-                        onClick = { /* mockup: tidak ada backend */ },
+                        onClick = {  },
                         modifier = Modifier.weight(1f)
                     )
                     BoardGoGhostButton(
@@ -154,7 +144,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ---------- Appearance (toggle dark mode manual) ----------
             item {
                 SectionLabel(
                     text = "Appearance",
@@ -182,7 +171,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ---------- Favorite games ----------
             item {
                 SectionLabel(
                     text = "Favorite games",
@@ -229,7 +217,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ---------- Sesi yang diikuti ----------
             item {
                 SectionLabel(
                     text = "Joined sessions (${state.joinedSessions.size})",
@@ -282,10 +269,8 @@ fun ProfileScreen(
     }
 }
 
-/** Lingkaran. */
 private val CircleShapeRound = androidx.compose.foundation.shape.CircleShape
 
-/** Kartu statistik (nilai Anton + label mono). */
 @Composable
 private fun StatCard(
     value: String,
@@ -313,3 +298,4 @@ private fun StatCard(
         )
     }
 }
+

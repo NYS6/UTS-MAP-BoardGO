@@ -1,6 +1,5 @@
 [versions]
 agp = "9.3.3"
-# Versi Kotlin WAJIB mengikuti built-in Kotlin milik AGP 9.x (AGP 9.3.3 -> Kotlin 2.2.10)
 kotlin = "2.2.10"
 coreKtx = "1.19.1"
 lifecycle = "2.11.0"
@@ -26,6 +25,4 @@ junit = { group = "junit", name = "junit", version = "4.13.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-# Catatan: plugin "kotlin-android" TIDAK dipakai karena AGP 9 sudah punya built-in Kotlin.
-# Yang dipakai hanya plugin Compose Compiler (kotlin-compose) agar @Composable ter-compile.
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

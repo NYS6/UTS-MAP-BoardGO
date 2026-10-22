@@ -49,13 +49,6 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.LoadStatus
 
-/**
- * ========================= LAYAR HOME =====================================
- * Meniru /home web app: logo + bell, baris "◉ NEARBY" (-> layar jarak GPS),
- * slogan "FIND A TABLE IN 30 SEC", chip filter game, kartu Featured
- * dengan tombol Join (mockup), dan daftar "Up next".
- * =========================================================================
- */
 @Composable
 fun HomeScreen(
     viewModel: BoardGOViewModel,
@@ -79,7 +72,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 130.dp)
                 ) {
-                    // ---------- Hero + header ----------
+
                     item {
                         Box {
                             SkyBackdrop(tall = true)
@@ -89,7 +82,7 @@ fun HomeScreen(
                                     .statusBarsPadding()
                                     .padding(horizontal = 20.dp)
                             ) {
-                                // Header: logo B + BOARDGO + bell
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -126,7 +119,6 @@ fun HomeScreen(
 
                                 Spacer(Modifier.height(14.dp))
 
-                                // Baris lokasi (mockup locate — GPS terintegrasi di tab FIND)
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -157,7 +149,6 @@ fun HomeScreen(
 
                                 Spacer(Modifier.height(8.dp))
 
-                                // Slogan besar
                                 Text(
                                     text = "FIND A TABLE\nIN 30 SEC",
                                     style = MaterialTheme.typography.displayLarge,
@@ -175,7 +166,6 @@ fun HomeScreen(
                         }
                     }
 
-                    // ---------- Chip filter game (game utama di depan) ----------
                     item {
                         Spacer(Modifier.height(14.dp))
                         LazyRow(
@@ -196,7 +186,6 @@ fun HomeScreen(
                         }
                     }
 
-                    // ---------- Kartu featured ----------
                     state.featured?.let { featured ->
                         item {
                             FeaturedCard(
@@ -210,7 +199,6 @@ fun HomeScreen(
                         }
                     }
 
-                    // ---------- Up next ----------
                     item {
                         SectionLabel(
                             text = "Up next",
@@ -254,7 +242,6 @@ fun HomeScreen(
     }
 }
 
-/** Kartu Featured (gaya web app: cover + info + tombol Join). */
 @Composable
 private fun FeaturedCard(
     session: GameSession,
@@ -274,7 +261,7 @@ private fun FeaturedCard(
             .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(22.dp))
     ) {
-        // Cover + overlay ringan
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -341,3 +328,4 @@ private fun FeaturedCard(
         }
     }
 }
+

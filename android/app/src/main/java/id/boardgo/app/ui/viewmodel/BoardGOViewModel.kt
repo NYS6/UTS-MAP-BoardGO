@@ -14,27 +14,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * ============================ MVVM ==========================================
- * BoardGOViewModel = state holder tunggal seluruh layar (MVVM).
- * Semua data dari DummyData (tanpa backend/Room/database/hardware sungguhan).
- * ===========================================================================
- */
-
 enum class LoadStatus { LOADING, SUCCESS, ERROR }
 
-/** Mode tampilan (dark mode manual). */
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
-// ---------------------------------------------------------------------------
-// State per layar
-// ---------------------------------------------------------------------------
-
-/** State layar Home (dashboard sesi — meniru web app). */
 data class HomeUiState(
     val status: LoadStatus = LoadStatus.LOADING,
     val sessions: List<GameSession> = emptyList(),
-    val selectedChip: String = "All",     // filter game: "All" | gameId
+    val selectedChip: String = "All",
     val locating: Boolean = false,
     val locationArea: String = "BSD",
     val errorMessage: String? = null
@@ -45,10 +32,6 @@ data class HomeUiState(
                 (selectedChip == "All" || it.gameId == selectedChip)
         }
 
-    /**
-     * Kartu featured: MAHJONG & MONOPOLY diutamakan (game paling populer),
-     * lalu sesi lain yang belum penuh & belum diikuti user.
-     */
     val featured: GameSession?
         get() {
             val eligible = openSessions.filter {
@@ -65,7 +48,6 @@ data class HomeUiState(
         get() = openSessions.filter { it.id != featured?.id }
 }
 
-/** State layar List / Discover. */
 data class GameListUiState(
     val status: LoadStatus = LoadStatus.LOADING,
     val allGames: List<Game> = emptyList(),
@@ -83,7 +65,6 @@ data class GameListUiState(
         }
 }
 
-/** State layar Nearby (FITUR JARAK GPS — mock lokasi + radius). */
 data class NearbyUiState(
     val radiusKm: Double = 5.0,
     val pickedVenueId: String? = null,
@@ -93,10 +74,8 @@ data class NearbyUiState(
     val radiusPct: Float get() = ((radiusKm / MAP_KM) * 100.0).toFloat()
 }
 
-/** Lebar peta (km) — sama dengan web app (MAP_KM). */
 const val MAP_KM = 12.0
 
-/** State layar Detail. */
 data class GameDetailUiState(
     val status: LoadStatus = LoadStatus.LOADING,
     val game: Game? = null,
@@ -105,7 +84,6 @@ data class GameDetailUiState(
     val errorMessage: String? = null
 )
 
-/** State layar Form buat sesi. */
 data class CreateSessionUiState(
     val gameId: String = "",
     val day: String = "Tonight",
@@ -125,7 +103,6 @@ data class CreateSessionUiState(
     val createdSessionId: String? = null
 )
 
-/** State layar Register / Login (AuthForm). */
 data class AuthUiState(
     val name: String = "",
     val email: String = "",
@@ -134,27 +111,21 @@ data class AuthUiState(
     val emailError: String? = null,
     val passwordError: String? = null,
     val isSubmitting: Boolean = false,
-    val successTick: Int = 0   // bertambah tiap submit sukses -> layar navigasi
+    val successTick: Int = 0
 )
 
-/** Pesan chat pada sebuah sesi. */
 data class ChatMessage(
     val id: String,
-    val senderId: String,          // "system" untuk pesan sistem
+    val senderId: String,
     val text: String,
     val time: String,
     val system: Boolean = false
 )
 
-/** State layar Chat. */
 data class ChatUiState(
     val messagesBySession: Map<String, List<ChatMessage>> = emptyMap()
 )
 
-/**
- * Notifikasi aplikasi (meniru web app). Jika chatSessionId terisi -> buka chat;
- * jika gameId terisi -> buka detail game.
- */
 data class AppNotification(
     val id: String,
     val title: String,
@@ -165,17 +136,14 @@ data class AppNotification(
     val gameId: String? = null
 )
 
-/** State layar Notifications. */
 data class NotifUiState(
     val notifications: List<AppNotification> = emptyList()
 ) {
     val unreadCount: Int get() = notifications.count { !it.read }
 }
 
-/** Tab layar My Games. */
 enum class MyGamesTab { UPCOMING, HOSTING, PAST }
 
-/** State layar My Games (tab Upcoming / Hosting / Past). */
 data class MyGamesUiState(
     val tab: MyGamesTab = MyGamesTab.UPCOMING,
     val upcoming: List<GameSession> = emptyList(),
@@ -190,25 +158,21 @@ data class MyGamesUiState(
         }
 }
 
-/** State layar Profil. */
 data class ProfileUiState(
     val me: Player? = null,
     val favoriteGames: List<Game> = emptyList(),
     val joinedSessions: List<GameSession> = emptyList()
 )
 
-// ---------------------------------------------------------------------------
 class BoardGOViewModel : ViewModel() {
 
-    // =================== SEMUA SESI (sumber kebenaran) =====================
     private val _allSessions = MutableStateFlow(DummyData.sessions)
     val allSessions: StateFlow<List<GameSession>> = _allSessions.asStateFlow()
 
-    // =================== State CHAT ========================================
     private val _chatState = MutableStateFlow(
         ChatUiState(
             messagesBySession = mapOf(
-                // Obrolan awal (meniru web app)
+
                 "s4" to listOf(
                     ChatMessage("m1", "u3", "Hey! Prelude cards are packed 🔥", "10:02"),
                     ChatMessage("m2", DummyData.CURRENT_USER_ID, "Nice, I'll bring chips", "10:05"),
@@ -219,11 +183,9 @@ class BoardGOViewModel : ViewModel() {
     )
     val chatState: StateFlow<ChatUiState> = _chatState.asStateFlow()
 
-    /** Daftar pesan sebuah sesi. */
     fun chatMessages(sessionId: String): List<ChatMessage> =
         _chatState.value.messagesBySession[sessionId].orEmpty()
 
-    /** Kirim pesan (mockup — dari user saat ini). */
     fun sendChat(sessionId: String, text: String) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
@@ -241,11 +203,10 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== State NOTIFIKASI ==================================
     private val _notifState = MutableStateFlow(
         NotifUiState(
             notifications = listOf(
-                // Notifikasi awal (meniru web app)
+
                 AppNotification("n1", "Kevin replied in chat",
                     "See you Saturday at Meeple House", "10m",
                     chatSessionId = "s4"),
@@ -259,7 +220,6 @@ class BoardGOViewModel : ViewModel() {
     )
     val notifState: StateFlow<NotifUiState> = _notifState.asStateFlow()
 
-    /** Tandai satu notifikasi sudah dibaca. */
     fun markNotifRead(notifId: String) {
         _notifState.update { state ->
             state.copy(
@@ -270,19 +230,16 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    /** Tandai semua notifikasi sudah dibaca. */
     fun markAllNotifsRead() {
         _notifState.update { state ->
             state.copy(notifications = state.notifications.map { it.copy(read = true) })
         }
     }
 
-    /** Push notifikasi baru (kepala paling atas). */
     private fun pushNotif(notif: AppNotification) {
         _notifState.update { it.copy(notifications = listOf(notif) + it.notifications) }
     }
 
-    /** Join sesi (mockup) — memperbarui Home, My Games, Profil, Nearby, Chat. */
     fun joinSession(sessionId: String) {
         val alreadyJoined = _allSessions.value
             .find { it.id == sessionId }
@@ -300,7 +257,6 @@ class BoardGOViewModel : ViewModel() {
             }
         }
 
-        // Pesan sistem di chat (meniru web app: "You joined the table 🎲")
         if (!alreadyJoined) {
             val joinedNow = _allSessions.value.find { it.id == sessionId }
                 ?.joinedPlayerIds
@@ -322,13 +278,11 @@ class BoardGOViewModel : ViewModel() {
             }
         }
 
-        // Perbarui turunan
         _homeState.update { it.copy(sessions = _allSessions.value) }
         loadMyGames()
         loadProfile()
         loadGameDetailQuiet()
 
-        // Push notifikasi join (meniru web app)
         if (!alreadyJoined) {
             val joinedNow = _allSessions.value.find { it.id == sessionId }
                 ?.joinedPlayerIds
@@ -347,7 +301,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== State Home ========================================
     private val _homeState = MutableStateFlow(HomeUiState(sessions = DummyData.sessions))
     val homeState: StateFlow<HomeUiState> = _homeState.asStateFlow()
 
@@ -365,7 +318,6 @@ class BoardGOViewModel : ViewModel() {
         _homeState.update { it.copy(selectedChip = chip) }
     }
 
-    /** MOCKUP tombol lokasi di Home ("NEARBY / LOCATING…"). */
     fun mockLocate() {
         viewModelScope.launch {
             _homeState.update { it.copy(locating = true) }
@@ -374,7 +326,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== State List / Discover =============================
     private val _listState = MutableStateFlow(GameListUiState())
     val listState: StateFlow<GameListUiState> = _listState.asStateFlow()
 
@@ -396,11 +347,9 @@ class BoardGOViewModel : ViewModel() {
         _listState.update { it.copy(selectedCategory = category) }
     }
 
-    // =================== State Nearby (jarak GPS) ===========================
     private val _nearbyState = MutableStateFlow(NearbyUiState())
     val nearbyState: StateFlow<NearbyUiState> = _nearbyState.asStateFlow()
 
-    /** Sesi LIVE (belum lewat) yang berada dalam radius jarak tertentu. */
     fun nearbySessions(radiusKm: Double = _nearbyState.value.radiusKm): List<GameSession> =
         _allSessions.value
             .filter { s ->
@@ -409,7 +358,6 @@ class BoardGOViewModel : ViewModel() {
             }
             .sortedBy { DummyData.venueById(it.venueId)?.distanceKm ?: 0.0 }
 
-    /** Sesi live pada sebuah venue. */
     fun venueSessions(venueId: String): List<GameSession> =
         _allSessions.value.filter {
             it.venueId == venueId && it.id !in DummyData.pastSessionIds
@@ -439,7 +387,6 @@ class BoardGOViewModel : ViewModel() {
         _nearbyState.update { it.copy(hint = null) }
     }
 
-    // =================== State Detail =======================================
     private val _detailState = MutableStateFlow(GameDetailUiState())
     val detailState: StateFlow<GameDetailUiState> = _detailState.asStateFlow()
 
@@ -453,7 +400,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    /** Refresh tanpa loading (dipanggil setelah joinSession). */
     private fun loadGameDetailQuiet() {
         val id = _detailState.value.game?.id ?: return
         applyGameDetail(id)
@@ -482,7 +428,6 @@ class BoardGOViewModel : ViewModel() {
         _detailState.update { it.copy(isFavorite = !it.isFavorite) }
     }
 
-    // =================== State Form =========================================
     private val _formState = MutableStateFlow(CreateSessionUiState())
     val formState: StateFlow<CreateSessionUiState> = _formState.asStateFlow()
 
@@ -499,7 +444,6 @@ class BoardGOViewModel : ViewModel() {
     fun onFormVenueChange(venueId: String) =
         _formState.update { it.copy(venueId = venueId, venueIdError = null) }
 
-    /** Field ANGKA: hanya digit (maks 2). */
     fun onFormMaxPlayersChange(raw: String) {
         val filtered = raw.filter { it.isDigit() }.take(2)
         _formState.update { it.copy(maxPlayers = filtered, maxPlayersError = null) }
@@ -573,7 +517,6 @@ class BoardGOViewModel : ViewModel() {
             delay(700)
             val newId = "c${System.currentTimeMillis()}"
 
-            // >>> Buat sesi NYATA (di-host oleh user) & masukkan ke data <<<
             val form = _formState.value
             val newSession = id.boardgo.app.data.model.GameSession(
                 id = newId,
@@ -593,7 +536,6 @@ class BoardGOViewModel : ViewModel() {
             loadMyGames()
             loadProfile()
 
-            // Push notifikasi publish (meniru web app)
             pushNotif(
                 AppNotification(
                     id = "np${System.currentTimeMillis()}",
@@ -610,7 +552,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== State Auth (Register / Login) ======================
     private val _authState = MutableStateFlow(AuthUiState())
     val authState: StateFlow<AuthUiState> = _authState.asStateFlow()
 
@@ -639,10 +580,6 @@ class BoardGOViewModel : ViewModel() {
         _authState.update { AuthUiState() }
     }
 
-    /**
-     * Submit register/login — validasi mengikuti web app:
-     * nama wajib, email regex, password min 6 karakter.
-     */
     fun submitAuth(isRegister: Boolean) {
         val cur = _authState.value
         var hasError = false
@@ -668,30 +605,29 @@ class BoardGOViewModel : ViewModel() {
 
         viewModelScope.launch {
             _authState.update { it.copy(isSubmitting = true) }
-            delay(700) // simulasi network
+            delay(700)
             _authState.update {
                 it.copy(isSubmitting = false, successTick = it.successTick + 1)
             }
         }
     }
 
-    // =================== State My Games =====================================
     private val _myGamesState = MutableStateFlow(MyGamesUiState())
     val myGamesState: StateFlow<MyGamesUiState> = _myGamesState.asStateFlow()
 
     fun loadMyGames() {
         val all = _allSessions.value
-        // Upcoming: diikuti DAN bukan yang kita host
+
         val upcoming = all.filter {
             DummyData.CURRENT_USER_ID in it.joinedPlayerIds &&
                 it.hostId != DummyData.CURRENT_USER_ID &&
                 it.id !in DummyData.pastSessionIds
         }
-        // Hosting: sesi yang kita host (belum lewat)
+
         val hosting = all.filter {
             it.hostId == DummyData.CURRENT_USER_ID && it.id !in DummyData.pastSessionIds
         }
-        // Past: sesi lampau yang diikuti
+
         val past = all.filter {
             DummyData.CURRENT_USER_ID in it.joinedPlayerIds &&
                 it.id in DummyData.pastSessionIds
@@ -703,7 +639,6 @@ class BoardGOViewModel : ViewModel() {
         _myGamesState.update { it.copy(tab = tab) }
     }
 
-    // =================== State Profil =======================================
     private val _profileState = MutableStateFlow(ProfileUiState())
     val profileState: StateFlow<ProfileUiState> = _profileState.asStateFlow()
 
@@ -712,7 +647,7 @@ class BoardGOViewModel : ViewModel() {
         _profileState.update {
             it.copy(
                 me = me,
-                // Favorit: Mahjong & Monopoly (game utama)
+
                 favoriteGames = DummyData.games.filter { g -> g.id in DummyData.featuredGameIds },
                 joinedSessions = _allSessions.value.filter { s ->
                     DummyData.CURRENT_USER_ID in s.joinedPlayerIds &&
@@ -722,7 +657,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== Theme (dark mode manual) ===========================
     private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
     val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
 
@@ -730,12 +664,9 @@ class BoardGOViewModel : ViewModel() {
         _themeMode.value = mode
     }
 
-    // =================== Helper =============================================
-    /** Venue terdekat berdasarkan radius (mockup jarak GPS). */
     fun nearbyVenues(radiusKm: Int): List<Venue> =
         DummyData.venues.filter { it.distanceKm <= radiusKm }.sortedBy { it.distanceKm }
 
-    // =================== Init (DI AKHIR CLASS agar semua property siap) ====
     init {
         loadGames()
         loadHome()
@@ -744,10 +675,11 @@ class BoardGOViewModel : ViewModel() {
     }
 
     companion object {
-        /** Validasi format email (regex sederhana). */
+
         fun isValidEmail(email: String): Boolean {
             val regex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
             return regex.matches(email)
         }
     }
 }
+

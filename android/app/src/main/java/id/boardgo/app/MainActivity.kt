@@ -17,13 +17,6 @@ import id.boardgo.app.ui.theme.BoardGoTheme
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.ThemeMode
 
-/**
- * Entry point aplikasi BoardGO.
- *
- * MainActivity MEWARISI ComponentActivity (bukan AppCompatActivity) dan
- * memakai setContent { } untuk merender Jetpack Compose — ini inti dari
- * migrasi ke Compose (tidak ada lagi findViewById / inflate XML).
- */
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,10 +24,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            // ViewModel di-share ke seluruh app (MVVM)
+
             val viewModel: BoardGOViewModel = viewModel()
 
-            // Mode tema dari state ViewModel (manual: Light/Dark/System)
             val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
             val darkTheme = when (themeMode) {
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()
@@ -42,7 +34,6 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.DARK -> true
             }
 
-            // Theme Material 3 CUSTOM BoardGO (bukan bawaan Android Studio)
             BoardGoTheme(darkTheme = darkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -54,3 +45,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

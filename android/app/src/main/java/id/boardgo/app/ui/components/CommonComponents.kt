@@ -42,13 +42,6 @@ import id.boardgo.app.R
 import id.boardgo.app.data.DummyData
 import id.boardgo.app.ui.theme.BoardGoColors
 
-/**
- * Komponen UI bersama BoardGO — design mengikuti web app asli:
- * kartu surface + ring tipis, label mono uppercase, pill status kursi,
- * cover foto game asli.
- */
-
-/** Pemetaan gameId → foto cover asli (diambil dari repo web). */
 object GameCovers {
     private val covers = mapOf(
         "catan" to R.drawable.game_catan,
@@ -68,7 +61,6 @@ object GameCovers {
     fun coverOf(gameId: String): Int? = covers[gameId]
 }
 
-/** Cover foto game (fallback: gradient + inisial bila tidak ada foto). */
 @Composable
 fun GameCover(
     gameId: String,
@@ -108,7 +100,6 @@ fun GameCover(
     }
 }
 
-/** Latar sky gradient (hero backdrop), meniru web app. */
 @Composable
 fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
     Box(modifier = modifier.fillMaxWidth().height(if (tall) 300.dp else 190.dp)) {
@@ -121,7 +112,7 @@ fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
                     )
                 )
         )
-        // "Glass" circles versi sederhana
+
         Box(
             modifier = Modifier
                 .offset(x = (-40).dp, y = 40.dp)
@@ -139,7 +130,6 @@ fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
     }
 }
 
-/** Top bar: judul UPPERCASE Anton; `light` = teks putih untuk latar sky. */
 @Composable
 fun TopBar(
     title: String,
@@ -197,7 +187,6 @@ fun TopBar(
     }
 }
 
-/** Tombol lingkaran "kaca" (untuk hero sky: bell, peta, dll). */
 @Composable
 fun GlassCircleButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -235,7 +224,6 @@ fun GlassCircleButton(
     }
 }
 
-/** Chip pilihan pill (filter & pilihan form) — aktif = oranye. */
 @Composable
 fun BoardGoChip(
     text: String,
@@ -263,7 +251,6 @@ fun BoardGoChip(
     }
 }
 
-/** Section label mono uppercase + garis tipis (persis pola web app). */
 @Composable
 fun SectionLabel(
     text: String,
@@ -292,7 +279,6 @@ fun SectionLabel(
     }
 }
 
-/** Pill metadata kecil (ring outline, mono) — meniru tag web app. */
 @Composable
 fun InfoPill(
     text: String,
@@ -314,10 +300,6 @@ fun InfoPill(
     }
 }
 
-/**
- * Pill status kursi: "FILLING FAST · 1 SEAT" (oranye),
- * "FULL" (merah) / "FREE" (hijau) — meniru badge di web app.
- */
 @Composable
 fun SeatPill(
     seatsLeft: Int,
@@ -339,7 +321,6 @@ fun SeatPill(
     }
 }
 
-/** Avatar pemain bulat (warna p1–p4). */
 @Composable
 fun PlayerAvatar(
     playerId: String,
@@ -365,7 +346,6 @@ fun PlayerAvatar(
     }
 }
 
-/** Tumpukan avatar saling menimpa (offset, bukan padding negatif). */
 @Composable
 fun AvatarStack(
     playerIds: List<String>,
@@ -388,7 +368,6 @@ fun AvatarStack(
     }
 }
 
-/** Layar loading penuh. */
 @Composable
 fun LoadingScreen(message: String = "Loading…", modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -404,7 +383,6 @@ fun LoadingScreen(message: String = "Loading…", modifier: Modifier = Modifier)
     }
 }
 
-/** Layar error + tombol coba lagi. */
 @Composable
 fun ErrorScreen(
     message: String,
@@ -438,7 +416,6 @@ fun ErrorScreen(
     }
 }
 
-/** Tombol utama oranye. */
 @Composable
 fun BoardGoPrimaryButton(
     text: String,
@@ -471,7 +448,6 @@ fun BoardGoPrimaryButton(
     }
 }
 
-/** Tombol sekunder (putih/outline). */
 @Composable
 fun BoardGoGhostButton(
     text: String,
@@ -493,7 +469,6 @@ fun BoardGoGhostButton(
     }
 }
 
-/** Banner sukses yang muncul sebentar. */
 @Composable
 fun SuccessBanner(
     visible: Boolean,
@@ -518,10 +493,6 @@ fun SuccessBanner(
     }
 }
 
-/**
- * Baris sesi ringkas (cover + nama Anton + mono meta + avatar + seat pill)
- * — dipakai layar Home, Nearby, dan daftar sesi.
- */
 @Composable
 fun SessionMiniRow(
     session: id.boardgo.app.data.model.GameSession,
@@ -589,3 +560,4 @@ fun SessionMiniRow(
         }
     }
 }
+

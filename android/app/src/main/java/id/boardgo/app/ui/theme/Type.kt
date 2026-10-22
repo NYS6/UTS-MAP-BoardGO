@@ -9,13 +9,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import id.boardgo.app.R
 
-/**
- * Tipografi BoardGO — mengikuti design web app asli:
- * - display : font ANTON (tebal, padat, selalu UPPERCASE untuk judul besar)
- * - label   : font JETBRAINS MONO (kapital kecil, letter-spacing lebar)
- * - body    : sans-serif (pengganti Inter)
- */
-
 val AntonFamily = FontFamily(
     Font(R.font.anton_regular, FontWeight.Normal),
     Font(R.font.anton_regular, FontWeight.Medium),
@@ -31,7 +24,7 @@ val MonoFamily = FontFamily(
 )
 
 val BoardGoTypography = Typography(
-    // Judul hero besar (slogan) — Anton
+
     displayLarge = TextStyle(
         fontFamily = AntonFamily,
         fontWeight = FontWeight.Normal,
@@ -64,7 +57,7 @@ val BoardGoTypography = Typography(
         fontSize = 18.sp,
         lineHeight = 19.sp
     ),
-    // Judul kartu (nama game) — Anton
+
     titleLarge = TextStyle(
         fontFamily = AntonFamily,
         fontWeight = FontWeight.Normal,
@@ -83,7 +76,7 @@ val BoardGoTypography = Typography(
         fontSize = 13.sp,
         lineHeight = 18.sp
     ),
-    // Teks isi — sans-serif (pengganti Inter)
+
     bodyLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -102,21 +95,21 @@ val BoardGoTypography = Typography(
         fontSize = 12.sp,
         lineHeight = 16.sp
     ),
-    // Label tombol
+
     labelLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 13.sp,
         letterSpacing = 0.2.sp
     ),
-    // Label mono kecil (metadata, chip info) — JetBrains Mono uppercase
+
     labelMedium = TextStyle(
         fontFamily = MonoFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         letterSpacing = 0.5.sp
     ),
-    // Label mono sangat kecil (nav, tag) — JetBrains Mono
+
     labelSmall = TextStyle(
         fontFamily = MonoFamily,
         fontWeight = FontWeight.Medium,
@@ -124,3 +117,4 @@ val BoardGoTypography = Typography(
         letterSpacing = 0.7.sp
     )
 )
+
