@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import id.boardgo.app.data.DummyData
 import id.boardgo.app.data.model.Game
 import id.boardgo.app.data.model.GameSession
-import id.boardgo.app.data.model.Level
 import id.boardgo.app.data.model.Player
 import id.boardgo.app.data.model.Venue
 import kotlinx.coroutines.delay
@@ -17,22 +16,15 @@ import kotlinx.coroutines.launch
 
 /**
  * ============================ MVVM ==========================================
- * BoardGOViewModel adalah SATU ViewModel pusat (state holder) untuk seluruh
- * layar. UI (View) hanya membaca StateFlow dan memanggil fungsi "event"
- * (onXxx) — tidak ada logika bisnis di dalam Composable.
- *
- * Semua data berasal dari DummyData (tanpa backend/Room/database).
+ * BoardGOViewModel adalah state holder tunggal untuk seluruh layar.
+ * View (Composable) hanya membaca StateFlow dan memanggil fungsi event.
+ * Semua data dari DummyData (tanpa backend/Room/database).
  * ===========================================================================
  */
 
-// ---------------------------------------------------------------------------
-// State UI
-// ---------------------------------------------------------------------------
-
-/** Status pemuatan data dummy (loading → content / error). */
 enum class LoadStatus { LOADING, SUCCESS, ERROR }
 
-/** State layar List. */
+/** State layar List / Discover. */
 data class GameListUiState(
     val status: LoadStatus = LoadStatus.LOADING,
     val allGames: List<Game> = emptyList(),
@@ -40,7 +32,6 @@ data class GameListUiState(
     val selectedCategory: String = "All",
     val errorMessage: String? = null
 ) {
-    /** Game hasil filter pencarian + kategori. */
     val filteredGames: List<Game>
         get() = allGames.filter { game ->
             val matchesQuery = game.name.contains(searchQuery, ignoreCase = true) ||
@@ -51,7 +42,7 @@ data class GameListUiState(
         }
 }
 
-/** State layar Detail (satu game + sesi yang tersedia). */
+/** State layar Detail. */
 data class GameDetailUiState(
     val status: LoadStatus = LoadStatus.LOADING,
     val game: Game? = null,
@@ -70,7 +61,6 @@ data class CreateSessionUiState(
     val fee: String = "Free",
     val note: String = "",
     val contactEmail: String = "",
-    // Error per-field (null = valid)
     val gameIdError: String? = null,
     val venueIdError: String? = null,
     val maxPlayersError: String? = null,
@@ -81,17 +71,26 @@ data class CreateSessionUiState(
     val createdSessionId: String? = null
 )
 
-/** State layar Fitur Native (mockup GPS / QR / fingerprint). */
+/** State layar Fitur Native (mockup GPS / QR / biometrik). */
 data class NativeFeatureUiState(
     val isGpsLoading: Boolean = false,
     val gpsErrorMessage: String? = null,
-    val currentLocation: String? = null,      // hasil mock lokasi
+    val currentLocation: String? = null,
     val nearbyRadiusKm: Int = 5,
     val isQrScanning: Boolean = false,
     val qrScanResult: String? = null,
     val isBioChecking: Boolean = false,
     val biometricResult: String? = null       // "success" / "failed"
 )
+
+/** State layar My Games (tab Upcoming / Past). */
+data class MyGamesUiState(
+    val showPast: Boolean = false,
+    val upcoming: List<GameSession> = emptyList(),
+    val past: List<GameSession> = emptyList()
+) {
+    val current: List<GameSession> get() = if (showPast) past else upcoming
+}
 
 /** State layar Profil. */
 data class ProfileUiState(
@@ -100,8 +99,6 @@ data class ProfileUiState(
     val joinedSessions: List<GameSession> = emptyList()
 )
 
-// ---------------------------------------------------------------------------
-// ViewModel
 // ---------------------------------------------------------------------------
 class BoardGOViewModel : ViewModel() {
 
@@ -113,11 +110,10 @@ class BoardGOViewModel : ViewModel() {
         loadGames()
     }
 
-    /** Simulasi pengambilan data (loading → success). */
     fun loadGames() {
         viewModelScope.launch {
             _listState.update { it.copy(status = LoadStatus.LOADING, errorMessage = null) }
-            delay(800) // simulasi latency network
+            delay(800)
             _listState.update {
                 it.copy(status = LoadStatus.SUCCESS, allGames = DummyData.games)
             }
@@ -136,13 +132,12 @@ class BoardGOViewModel : ViewModel() {
     private val _detailState = MutableStateFlow(GameDetailUiState())
     val detailState: StateFlow<GameDetailUiState> = _detailState.asStateFlow()
 
-    /** Dipanggil layar Detail dengan gameId dari argumen navigasi. */
     fun loadGameDetail(gameId: String) {
         viewModelScope.launch {
             _detailState.update {
                 it.copy(status = LoadStatus.LOADING, game = null, errorMessage = null)
             }
-            delay(600) // simulasi latency
+            delay(600)
             val game = DummyData.gameById(gameId)
             if (game != null) {
                 _detailState.update {
@@ -154,7 +149,7 @@ class BoardGOViewModel : ViewModel() {
                 }
             } else {
                 _detailState.update {
-                    it.copy(status = LoadStatus.ERROR, errorMessage = "Game tidak ditemukan")
+                    it.copy(status = LoadStatus.ERROR, errorMessage = "Game not found")
                 }
             }
         }
@@ -168,7 +163,6 @@ class BoardGOViewModel : ViewModel() {
     private val _formState = MutableStateFlow(CreateSessionUiState())
     val formState: StateFlow<CreateSessionUiState> = _formState.asStateFlow()
 
-    /** Pra-isi game dari layar Detail (argument passing). */
     fun prefillGame(gameId: String) {
         _formState.update { it.copy(gameId = gameId, gameIdError = null) }
     }
@@ -182,81 +176,61 @@ class BoardGOViewModel : ViewModel() {
     fun onFormVenueChange(venueId: String) =
         _formState.update { it.copy(venueId = venueId, venueIdError = null) }
 
-    /**
-     * Field ANGKA (max players): hanya boleh berisi digit.
-     * Karakter non-digit dibuang dan error dibersihkan.
-     */
+    /** Field ANGKA: hanya digit yang diterima (maks 2 karakter). */
     fun onFormMaxPlayersChange(raw: String) {
-        val filtered = raw.filter { it.isDigit() }.take(2) // maksimal 2 digit
+        val filtered = raw.filter { it.isDigit() }.take(2)
         _formState.update { it.copy(maxPlayers = filtered, maxPlayersError = null) }
     }
 
     fun onFormFeeChange(fee: String) = _formState.update { it.copy(fee = fee) }
 
     fun onFormNoteChange(note: String) {
-        // Maksimal 120 karakter (contoh batas input)
-        val limited = note.take(120)
-        _formState.update { it.copy(note = limited, noteError = null) }
+        _formState.update { it.copy(note = note.take(120), noteError = null) }
     }
 
-    /**
-     * Field EMAIL: dipanggil setiap ketikan. Error dibersihkan otomatis
-     * saat input sudah valid, agar pesan error tidak "nyangkut".
-     */
+    /** Field EMAIL: validasi regex real-time. */
     fun onFormEmailChange(raw: String) {
         val trimmed = raw.trim()
         val error = when {
             trimmed.isEmpty() -> null
-            !isValidEmail(trimmed) -> "Format email tidak valid"
+            !isValidEmail(trimmed) -> "Invalid email format"
             else -> null
         }
         _formState.update { it.copy(contactEmail = raw, contactEmailError = error) }
     }
 
-    /** Reset state form (dipanggil setelah sukses submit). */
     fun resetForm() {
         _formState.update { CreateSessionUiState() }
     }
 
-    /**
-     * Submit form dengan VALIDASI lengkap:
-     * - game wajib dipilih
-     * - venue wajib dipilih
-     * - max players: wajib angka, 2..12
-     * - note: opsional, maks 120 karakter (sudah dibatasi di onFormNoteChange)
-     * - email: jika diisi wajib format email yang valid
-     */
+    /** Submit + validasi lengkap (game/venue wajib, players 2–12, email format). */
     fun submitSessionForm() {
         val current = _formState.value
         var hasError = false
 
         val gameError = if (current.gameId.isBlank()) {
-            hasError = true
-            "Pilih game terlebih dahulu"
+            hasError = true; "Pick a game first"
         } else null
 
         val venueError = if (current.venueId.isBlank()) {
-            hasError = true
-            "Pilih venue terlebih dahulu"
+            hasError = true; "Pick a venue first"
         } else null
 
         val maxPlayersNum = current.maxPlayers.toIntOrNull()
         val maxError = when {
             current.maxPlayers.isBlank() -> {
-                hasError = true; "Jumlah pemain wajib diisi"
+                hasError = true; "Number of players is required"
             }
             maxPlayersNum == null || maxPlayersNum < 2 || maxPlayersNum > 12 -> {
-                hasError = true; "Jumlah pemain harus 2–12"
+                hasError = true; "Players must be 2–12"
             }
             else -> null
         }
 
-        // Validasi EMAIL (opsional, tapi jika diisi harus format email yang benar)
         val emailError = if (current.contactEmail.isNotBlank() &&
             !isValidEmail(current.contactEmail.trim())
         ) {
-            hasError = true
-            "Format email tidak valid"
+            hasError = true; "Invalid email format"
         } else null
 
         if (hasError) {
@@ -273,7 +247,6 @@ class BoardGOViewModel : ViewModel() {
             return
         }
 
-        // Submit sukses → simulasi simpan
         viewModelScope.launch {
             _formState.update { it.copy(isSubmitting = true) }
             delay(700)
@@ -292,25 +265,21 @@ class BoardGOViewModel : ViewModel() {
     private val _nativeState = MutableStateFlow(NativeFeatureUiState())
     val nativeState: StateFlow<NativeFeatureUiState> = _nativeState.asStateFlow()
 
-    /** MOCKUP GPS: simulasi "mendapatkan lokasi" tanpa akses hardware. */
+    /** MOCKUP GPS — simulasi tanpa hardware. */
     fun mockFetchLocation() {
         viewModelScope.launch {
             _nativeState.update {
                 it.copy(isGpsLoading = true, gpsErrorMessage = null, currentLocation = null)
             }
             delay(1200)
-            // 80% berhasil, 20% gagal (contoh penanganan error state)
             val success = (0..4).random() != 0
             if (success) {
                 _nativeState.update {
-                    it.copy(
-                        isGpsLoading = false,
-                        currentLocation = "BSD City, -6.3019, 106.6535"
-                    )
+                    it.copy(isGpsLoading = false, currentLocation = "BSD City · -6.3019, 106.6535")
                 }
             } else {
                 _nativeState.update {
-                    it.copy(isGpsLoading = false, gpsErrorMessage = "Lokasi tidak tersedia. Coba lagi.")
+                    it.copy(isGpsLoading = false, gpsErrorMessage = "Location unavailable. Try again.")
                 }
             }
         }
@@ -320,7 +289,7 @@ class BoardGOViewModel : ViewModel() {
         _nativeState.update { it.copy(nearbyRadiusKm = radiusKm) }
     }
 
-    /** MOCKUP QR Scanner: simulasi pemindaian kode. */
+    /** MOCKUP QR Scanner. */
     fun mockScanQr() {
         viewModelScope.launch {
             _nativeState.update { it.copy(isQrScanning = true, qrScanResult = null) }
@@ -334,7 +303,7 @@ class BoardGOViewModel : ViewModel() {
 
     fun clearQrResult() = _nativeState.update { it.copy(qrScanResult = null) }
 
-    /** MOCKUP Biometrik: simulasi autentikasi sidik jari. */
+    /** MOCKUP Biometrik. */
     fun mockAuthenticateBiometric() {
         viewModelScope.launch {
             _nativeState.update { it.copy(isBioChecking = true, biometricResult = null) }
@@ -351,12 +320,33 @@ class BoardGOViewModel : ViewModel() {
 
     fun clearBiometricResult() = _nativeState.update { it.copy(biometricResult = null) }
 
+    // =================== State Layar My Games ===============================
+    private val _myGamesState = MutableStateFlow(MyGamesUiState())
+    val myGamesState: StateFlow<MyGamesUiState> = _myGamesState.asStateFlow()
+
+    fun loadMyGames() {
+        val joined = DummyData.sessions.filter {
+            DummyData.CURRENT_USER_ID in it.joinedPlayerIds
+        }
+        _myGamesState.update {
+            it.copy(
+                upcoming = joined.filter { s -> s.id !in DummyData.pastSessionIds },
+                past = joined.filter { s -> s.id in DummyData.pastSessionIds }
+            )
+        }
+    }
+
+    fun onMyGamesTabChange(showPast: Boolean) {
+        _myGamesState.update { it.copy(showPast = showPast) }
+    }
+
     // =================== State Layar Profil =================================
     private val _profileState = MutableStateFlow(ProfileUiState())
     val profileState: StateFlow<ProfileUiState> = _profileState.asStateFlow()
 
     init {
         loadProfile()
+        loadMyGames()
     }
 
     fun loadProfile() {
@@ -366,7 +356,7 @@ class BoardGOViewModel : ViewModel() {
                 me = me,
                 favoriteGames = DummyData.games.filter { g -> g.id in listOf("catan", "mars") },
                 joinedSessions = DummyData.sessions.filter { s ->
-                    DummyData.CURRENT_USER_ID in s.joinedPlayerIds
+                    DummyData.CURRENT_USER_ID in s.joinedPlayerIds && s.id !in DummyData.pastSessionIds
                 }
             )
         }
@@ -377,11 +367,7 @@ class BoardGOViewModel : ViewModel() {
         DummyData.venues.filter { it.distanceKm <= radiusKm }.sortedBy { it.distanceKm }
 
     companion object {
-        /**
-         * Validasi format email dengan regex sederhana:
-         * harus ada bagian lokal, karakter "@", domain, dan TLD minimal 2 huruf.
-         * Contoh valid: dimas@boardgo.id — contoh invalid: dimas@boardgo / dimas@.
-         */
+        /** Validasi format email (regex sederhana). */
         fun isValidEmail(email: String): Boolean {
             val regex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
             return regex.matches(email)

@@ -1,10 +1,10 @@
 package id.boardgo.app.ui.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,8 +31,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -42,24 +41,31 @@ import androidx.navigation.navArgument
 import id.boardgo.app.ui.screens.detail.GameDetailScreen
 import id.boardgo.app.ui.screens.form.CreateSessionScreen
 import id.boardgo.app.ui.screens.list.GameListScreen
+import id.boardgo.app.ui.screens.mygames.MyGamesScreen
 import id.boardgo.app.ui.screens.nativefeature.NativeFeatureScreen
 import id.boardgo.app.ui.screens.profile.ProfileScreen
+import id.boardgo.app.ui.screens.welcome.WelcomeScreen
+import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
 /**
- * ============ NAVIGASI (NavHost + NavController) ===========================
- * Route yang tersedia:
- *  - "list"        : Layar List (LazyColumn)
- *  - "detail/{gameId}" : Layar Detail  <-- ARGUMEN gameId dari List
- *  - "create?gameId={gameId}" : Layar Form (opsional terisi dari Detail)
- *  - "native"      : Layar Fitur Native (mockup)
- *  - "profile"     : Layar Profil
- * =========================================================================
+ * ============================ NAVIGASI ====================================
+ * Route:
+ *  - "welcome"               : landing (start destination)
+ *  - "list"                  : Layar List / Discover (LazyColumn)
+ *  - "detail/{gameId}"       : Detail  << ARGUMEN gameId dari List
+ *  - "create?gameId={gameId}" : Form (opsional pra-isi dari Detail)
+ *  - "mygames"               : My Games (tab Upcoming/Past)
+ *  - "native"                : Fitur Native mockup
+ *  - "profile"               : Profil (Log out -> kembali ke welcome)
+ * =======================================================================
  */
 object Routes {
+    const val WELCOME = "welcome"
     const val LIST = "list"
     const val DETAIL = "detail/{gameId}"
     const val CREATE = "create?gameId={gameId}"
+    const val MYGAMES = "mygames"
     const val NATIVE = "native"
     const val PROFILE = "profile"
 
@@ -84,21 +90,32 @@ fun BoardGoNavHost(
     ) {
         NavHost(
             navController = navController,
-            startDestination = Routes.LIST,
+            startDestination = Routes.WELCOME,
             modifier = Modifier.fillMaxSize()
         ) {
-            // ---------- 1. LIST ----------
+            // ---------- WELCOME (landing) ----------
+            composable(Routes.WELCOME) {
+                WelcomeScreen(
+                    onStart = {
+                        navController.navigate(Routes.LIST) {
+                            popUpTo(Routes.WELCOME) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // ---------- LIST / DISCOVER ----------
             composable(Routes.LIST) {
                 GameListScreen(
                     viewModel = viewModel,
                     onGameClick = { gameId ->
-                        // >>> PASSING ARGUMENT: gameId dikirim ke layar Detail <<<
+                        // >>> PASSING ARGUMENT: gameId ke layar Detail <<<
                         navController.navigate(Routes.detail(gameId))
                     }
                 )
             }
 
-            // ---------- 2. DETAIL (dengan argumen gameId) ----------
+            // ---------- DETAIL (argumen gameId) ----------
             composable(
                 route = Routes.DETAIL,
                 arguments = listOf(navArgument("gameId") { type = NavType.StringType })
@@ -109,13 +126,13 @@ fun BoardGoNavHost(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onCreateSession = { selectedGameId ->
-                        // >>> PASSING ARGUMENT lagi: ke layar Form <<<
+                        // >>> PASSING ARGUMENT: gameId ke layar Form <<<
                         navController.navigate(Routes.create(selectedGameId))
                     }
                 )
             }
 
-            // ---------- 3. FORM / INPUT ----------
+            // ---------- FORM / INPUT ----------
             composable(
                 route = Routes.CREATE,
                 arguments = listOf(
@@ -132,7 +149,6 @@ fun BoardGoNavHost(
                     initialGameId = gameId,
                     onBack = { navController.popBackStack() },
                     onSuccess = { selectedGameId ->
-                        // Buka Detail game yang baru saja di-host
                         navController.navigate(Routes.detail(selectedGameId)) {
                             popUpTo(Routes.LIST)
                         }
@@ -140,7 +156,15 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- 4. FITUR NATIVE (MOCKUP) ----------
+            // ---------- MY GAMES ----------
+            composable(Routes.MYGAMES) {
+                MyGamesScreen(
+                    viewModel = viewModel,
+                    onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) }
+                )
+            }
+
+            // ---------- FITUR NATIVE (MOCKUP) ----------
             composable(Routes.NATIVE) {
                 NativeFeatureScreen(
                     viewModel = viewModel,
@@ -148,23 +172,29 @@ fun BoardGoNavHost(
                 )
             }
 
-            // ---------- 5. PROFIL ----------
+            // ---------- PROFIL ----------
             composable(Routes.PROFILE) {
                 ProfileScreen(
                     viewModel = viewModel,
-                    onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) }
+                    onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) },
+                    onLogout = {
+                        // Mockup log out: kembali ke layar welcome
+                        navController.navigate(Routes.WELCOME) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
                 )
             }
         }
 
-        // ---------- Bottom navigation bar ----------
-        if (currentRoute != null) {
+        // ---------- Bottom navigation (pill melayang, gaya web app) ----------
+        if (currentRoute != null && currentRoute != Routes.WELCOME) {
             BottomNavBar(
                 currentRoute = currentRoute,
                 modifier = Modifier.align(Alignment.BottomCenter),
                 onNavigate = { route ->
                     navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
+                        popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
                         launchSingleTop = true
@@ -177,7 +207,14 @@ fun BoardGoNavHost(
     }
 }
 
-/** Bottom navigation bar (5 menu, dengan tombol "+" di tengah). */
+/** Item bottom nav. */
+private data class NavItem(
+    val route: String,
+    val label: String,
+    val icon: ImageVector
+)
+
+/** Bottom bar pill melayang — meniru web app (HOME · MINE · + · ME · FITUR). */
 @Composable
 private fun BottomNavBar(
     currentRoute: String?,
@@ -187,7 +224,8 @@ private fun BottomNavBar(
 ) {
     val items = listOf(
         NavItem(Routes.LIST, "HOME", Icons.Filled.Home),
-        null, // tempat tombol "+"
+        NavItem(Routes.MYGAMES, "MINE", Icons.Filled.ViewAgenda),
+        null, // tombol "+"
         NavItem(Routes.PROFILE, "ME", Icons.Filled.Person),
         NavItem(Routes.NATIVE, "FITUR", Icons.Filled.Place)
     )
@@ -199,28 +237,28 @@ private fun BottomNavBar(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+                .clip(RoundedCornerShape(22.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(22.dp))
+                .padding(horizontal = 6.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             items.forEach { item ->
                 if (item == null) {
-                    // Tombol "+" (untuk layar Form)
+                    // Tombol "+" (layar Form)
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
-                            .offset(y = (-14).dp)
-                            .clip(RoundedCornerShape(16.dp))
+                            .size(46.dp)
+                            .offset(y = (-12).dp)
+                            .clip(RoundedCornerShape(15.dp))
                             .background(
                                 Brush.linearGradient(
                                     listOf(
                                         MaterialTheme.colorScheme.primary,
-                                        BoardGoMeeple
+                                        BoardGoColors.Meeple
                                     )
                                 )
                             )
@@ -229,16 +267,16 @@ private fun BottomNavBar(
                     ) {
                         Icon(
                             Icons.Filled.Add,
-                            contentDescription = "Host game",
+                            contentDescription = "Host a game",
                             tint = Color.White,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 } else {
                     NavButton(
                         item = item,
                         selected = currentRoute == item.route ||
-                            (item.route.startsWith("detail") && currentRoute?.startsWith("detail") == true),
+                            (item.route == Routes.LIST && currentRoute?.startsWith("detail") == true),
                         onClick = { onNavigate(item.route) }
                     )
                 }
@@ -247,14 +285,7 @@ private fun BottomNavBar(
     }
 }
 
-/** Data item bottom nav. */
-private data class NavItem(
-    val route: String,
-    val label: String,
-    val icon: ImageVector
-)
-
-/** Tombol navigasi. */
+/** Tombol nav: ikon + label mono; aktif = oranye + pill lembut. */
 @Composable
 private fun NavButton(
     item: NavItem,
@@ -264,19 +295,24 @@ private fun NavButton(
     val tint = if (selected) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.onSurfaceVariant
 
-    Column(
+    Row(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
+            .background(
+                if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                else Color.Transparent
+            )
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 11.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = item.icon,
             contentDescription = item.label,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(16.dp),
             tint = tint
         )
+        androidx.compose.foundation.layout.Spacer(Modifier.size(5.dp))
         Text(
             text = item.label,
             style = MaterialTheme.typography.labelSmall,
@@ -284,6 +320,3 @@ private fun NavButton(
         )
     }
 }
-
-/** Warna meeple (oranye-kuning) untuk gradien tombol +. */
-private val BoardGoMeeple = Color(0xFFF2A119)

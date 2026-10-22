@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
@@ -48,14 +47,10 @@ import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
 /**
- * ================== LAYAR 4: FITUR NATIVE (MOCKUP) ========================
- * MOCKUP UI untuk 3 fitur native Android — TANPA akses hardware sungguhan:
- * 1. GPS / Lokasi      → simulasi "mendapatkan lokasi" + venue terdekat
- * 2. Kamera (QR Scan)  → simulasi pemindaian kode QR
- * 3. Biometrik         → simulasi autentikasi sidik jari
- *
- * Semua hasil dihasilkan oleh ViewModel (dummy), bukan sensor/kamera asli.
- * =========================================================================
+ * ================== LAYAR FITUR NATIVE (MOCKUP) ===========================
+ * Mockup UI GPS / Kamera (QR) / Biometrik — TANPA akses hardware sungguhan.
+ * Semua hasil disimulasikan oleh ViewModel (dummy).
+ * ========================================================================
  */
 @Composable
 fun NativeFeatureScreen(
@@ -70,19 +65,19 @@ fun NativeFeatureScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        TopBar(title = "Fitur Native", onBack = onBack)
+        TopBar(title = "Native features", onBack = onBack)
 
         LazyColumn(
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // =============== MOCKUP 1: GPS / LOKASI ===============
+            // =============== MOCKUP 1: GPS ===============
             item {
                 FeatureCard(
                     icon = { Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Color.White) },
                     iconGradient = listOf(BoardGoColors.SkyDeep, BoardGoColors.Sky),
-                    title = "Lokasi Saya (GPS)",
-                    subtitle = "Mockup — tanpa akses GPS asli"
+                    title = "Location (GPS)",
+                    subtitle = "Mockup — no real GPS access"
                 ) {
                     when {
                         state.isGpsLoading -> {
@@ -96,7 +91,7 @@ fun NativeFeatureScreen(
                                     strokeWidth = 2.dp
                                 )
                                 Text(
-                                    text = "Mendapatkan lokasi…",
+                                    text = "Getting your location…",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -110,7 +105,7 @@ fun NativeFeatureScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(Modifier.height(12.dp))
-                            SectionLabel(text = "Venue terdekat (≤ ${state.nearbyRadiusKm} km)")
+                            SectionLabel(text = "Nearby venues (≤ ${state.nearbyRadiusKm} km)")
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 listOf(1, 3, 5, 10).forEach { radius ->
                                     BoardGoChip(
@@ -124,7 +119,7 @@ fun NativeFeatureScreen(
                             val venues = viewModel.nearbyVenues(state.nearbyRadiusKm)
                             if (venues.isEmpty()) {
                                 Text(
-                                    text = "Tidak ada venue dalam radius ini.",
+                                    text = "No venues within this radius.",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -148,7 +143,7 @@ fun NativeFeatureScreen(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
-                                        InfoPill(text = "${venue.distanceKm} km")
+                                        InfoPill(text = "${venue.distanceKm} KM")
                                     }
                                 }
                             }
@@ -165,7 +160,7 @@ fun NativeFeatureScreen(
 
                     Spacer(Modifier.height(14.dp))
                     BoardGoPrimaryButton(
-                        text = if (state.currentLocation == null) "Dapatkan Lokasi" else "Perbarui Lokasi",
+                        text = if (state.currentLocation == null) "Get location" else "Refresh location",
                         onClick = viewModel::mockFetchLocation,
                         enabled = !state.isGpsLoading,
                         loading = state.isGpsLoading,
@@ -174,7 +169,7 @@ fun NativeFeatureScreen(
                 }
             }
 
-            // =============== MOCKUP 2: QR SCANNER (KAMERA) ===============
+            // =============== MOCKUP 2: QR SCANNER ===============
             item {
                 FeatureCard(
                     icon = { Icon(Icons.Filled.QrCodeScanner, contentDescription = null, tint = Color.White) },
@@ -182,10 +177,9 @@ fun NativeFeatureScreen(
                         MaterialTheme.colorScheme.primary,
                         BoardGoColors.Meeple
                     ),
-                    title = "Pindai QR (Kamera)",
-                    subtitle = "Mockup — tanpa kamera asli"
+                    title = "QR Scanner (Camera)",
+                    subtitle = "Mockup — no real camera"
                 ) {
-                    // Area "viewfinder" bergaya scanner
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -200,7 +194,7 @@ fun NativeFeatureScreen(
                                 CircularProgressIndicator(color = BoardGoColors.Meeple)
                                 Spacer(Modifier.height(12.dp))
                                 Text(
-                                    text = "Mensimulasikan pemindaian…",
+                                    text = "Scanning…",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color.White
                                 )
@@ -215,7 +209,7 @@ fun NativeFeatureScreen(
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
-                                    text = "Arahkan ke QR di meja bermain",
+                                    text = "Point at the QR code on your table",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.White.copy(alpha = 0.7f),
                                     textAlign = TextAlign.Center
@@ -233,7 +227,7 @@ fun NativeFeatureScreen(
                             Spacer(Modifier.height(12.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "Hasil pindai: ",
+                                    text = "Scan result: ",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -248,7 +242,7 @@ fun NativeFeatureScreen(
                     Spacer(Modifier.height(14.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         BoardGoPrimaryButton(
-                            text = "Pindai",
+                            text = "Scan",
                             onClick = viewModel::mockScanQr,
                             enabled = !state.isQrScanning,
                             loading = state.isQrScanning,
@@ -270,8 +264,8 @@ fun NativeFeatureScreen(
                 FeatureCard(
                     icon = { Icon(Icons.Filled.Fingerprint, contentDescription = null, tint = Color.White) },
                     iconGradient = listOf(BoardGoColors.Success, BoardGoColors.Sky),
-                    title = "Masuk dengan Biometrik",
-                    subtitle = "Mockup — tanpa sensor sidik jari asli"
+                    title = "Sign in with Biometrics",
+                    subtitle = "Mockup — no real fingerprint sensor"
                 ) {
                     Box(
                         modifier = Modifier
@@ -296,10 +290,10 @@ fun NativeFeatureScreen(
                             Spacer(Modifier.height(10.dp))
                             Text(
                                 text = when {
-                                    state.isBioChecking -> "Memeriksa sidik jari…"
-                                    state.biometricResult == "success" -> "✔ Identitas terverifikasi"
-                                    state.biometricResult == "failed" -> "✖ Sidik jari tidak cocok"
-                                    else -> "Sentuh sensor untuk masuk"
+                                    state.isBioChecking -> "Verifying fingerprint…"
+                                    state.biometricResult == "success" -> "✔ Identity verified"
+                                    state.biometricResult == "failed" -> "✖ Fingerprint not recognized"
+                                    else -> "Touch the sensor to sign in"
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = when {
@@ -314,7 +308,7 @@ fun NativeFeatureScreen(
                     Spacer(Modifier.height(14.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         BoardGoPrimaryButton(
-                            text = "Autentikasi",
+                            text = "Authenticate",
                             onClick = viewModel::mockAuthenticateBiometric,
                             enabled = !state.isBioChecking,
                             loading = state.isBioChecking,
@@ -334,7 +328,7 @@ fun NativeFeatureScreen(
     }
 }
 
-/** Kartu fitur native dengan ikon gradient + konten slot. */
+/** Kartu fitur native (ikon gradient + judul + konten). */
 @Composable
 private fun FeatureCard(
     icon: @Composable () -> Unit,
@@ -367,7 +361,7 @@ private fun FeatureCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = subtitle,
+                    text = subtitle.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )

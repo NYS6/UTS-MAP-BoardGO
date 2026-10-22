@@ -97,11 +97,13 @@ class MainActivity : ComponentActivity() {
 
 | # | Layar | File | Teknologi Utama |
 |---|-------|------|-----------------|
-| 1 | **List Game** | `ui/screens/list/GameListScreen.kt` | **`LazyColumn`** + pencarian + filter kategori |
-| 2 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Menerima argumen `gameId`, loading state |
-| 3 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
-| 4 | **Fitur Native (Mockup)** | `ui/screens/nativefeature/NativeFeatureScreen.kt` | Mockup **GPS + QR Scanner (kamera) + Biometrik** — tanpa hardware asli |
-| 5 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, sesi yang diikuti |
+| 1 | **Welcome / Landing** | `ui/screens/welcome/WelcomeScreen.kt` | Slogan "FIND PEOPLE. FIND GAMES. PLAY TOGETHER." + foto papan asli |
+| 2 | **List / Discover** | `ui/screens/list/GameListScreen.kt` | **`LazyColumn`** + pencarian + filter kategori + cover foto game |
+| 3 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Menerima argumen `gameId`, stat blocks, kartu sesi + SeatPill |
+| 4 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
+| 5 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab Upcoming/Past (`remember` + ViewModel) |
+| 6 | **Fitur Native (Mockup)** | `ui/screens/nativefeature/NativeFeatureScreen.kt` | Mockup **GPS + QR Scanner (kamera) + Biometrik** — tanpa hardware asli |
+| 7 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, log out (mockup) |
 
 ---
 
@@ -111,11 +113,17 @@ Semua file di `ui/theme/` **dibuat sendiri**, bukan template default Android Stu
 
 - **`Color.kt`** — palet warna BoardGO hasil konversi OKLCH dari web app
   (primary oranye `#F84F2F`, sky blue, success, dll).
-- **`Type.kt`** — `BoardGoTypography` dengan 3 gaya: display (judul besar),
-  body (teks), dan **mono (label kecil, meniru font JetBrains Mono)**.
+- **`Type.kt`** — memakai **font asli dari design web app** (di-bundle di `res/font/`):
+  - **Anton** (`anton_regular.ttf`) untuk semua judul display — selalu UPPERCASE
+  - **JetBrains Mono** (`jetbrainsmono_*.ttf`) untuk label kecil uppercase ber-letter-spacing
+  - Sans-serif untuk teks isi (pengganti Inter)
 - **`Shape.kt`** — `BoardGoShapes` (radius kartu 20 dp, chip pill).
 - **`Theme.kt`** — `BoardGoTheme()` memasang colorScheme + typography + shapes
   ke `MaterialTheme`. Dipakai di MainActivity.
+
+**Aset visual asli** dari repo web juga dibundel di `res/drawable/game_*.jpg`
+(12 foto game: Catan, Wingspan, Azul, …) — dipakai untuk cover kartu, hero detail,
+thumbnail My Games & Profil, sehingga tampilan identik dengan app web.
 
 ---
 
@@ -236,11 +244,16 @@ android/app/src/main/java/id/boardgo/
     ├── navigation/BoardGoNavHost.kt // NavHost + argumen + bottom bar
     ├── viewmodel/BoardGOViewModel.kt// SEMUA state + logika (MVVM)
     └── screens/
-        ├── list/GameListScreen.kt       // Layar 1 — LazyColumn
-        ├── detail/GameDetailScreen.kt   // Layar 2 — argumen gameId
-        ├── form/CreateSessionScreen.kt  // Layar 3 — validasi angka & email
-        ├── nativefeature/NativeFeatureScreen.kt // Layar 4 — mockup GPS/QR/Biometrik
-        └── profile/ProfileScreen.kt     // Layar 5 — profil & statistik
+        ├── welcome/WelcomeScreen.kt       // Landing (start destination)
+        ├── list/GameListScreen.kt         // List/LazyColumn + foto cover
+        ├── detail/GameDetailScreen.kt     // Detail + argumen gameId
+        ├── form/CreateSessionScreen.kt    // Form validasi angka & email
+        ├── mygames/MyGamesScreen.kt       // Tab Upcoming/Past
+        ├── nativefeature/NativeFeatureScreen.kt // Mockup GPS/QR/Biometrik
+        └── profile/ProfileScreen.kt       // Profil & statistik
+res/
+├── font/     // Anton + JetBrains Mono (font asli design web)
+└── drawable/ // 12 foto game game_*.jpg (asli dari repo web)
 ```
 
 **Alur data (MVVM):**

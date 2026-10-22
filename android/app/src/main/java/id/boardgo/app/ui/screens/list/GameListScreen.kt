@@ -1,6 +1,7 @@
 package id.boardgo.app.ui.screens.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,10 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -31,14 +33,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.boardgo.app.data.model.Game
 import id.boardgo.app.ui.components.BoardGoChip
 import id.boardgo.app.ui.components.ErrorScreen
-import id.boardgo.app.ui.components.InfoPill
+import id.boardgo.app.ui.components.GameCover
 import id.boardgo.app.ui.components.LoadingScreen
 import id.boardgo.app.ui.components.SectionLabel
 import id.boardgo.app.ui.components.SkyBackdrop
@@ -47,10 +49,11 @@ import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.LoadStatus
 
 /**
- * ===================== LAYAR 1: LIST GAME (LazyColumn) =====================
- * Menampilkan daftar seluruh game board + pencarian + filter kategori.
- * Klik item -> navigasi ke layar Detail dengan gameId sebagai argumen.
- * =========================================================================
+ * ============ LAYAR LIST / DISCOVER (LazyColumn) ===========================
+ * Meniru layar Discover pada web app: hero slogan, search, filter kategori,
+ * daftar kartu dengan cover foto game asli.
+ * Klik item -> navigasi ke Detail dengan gameId sebagai argumen.
+ * ==========================================================================
  */
 @Composable
 fun GameListScreen(
@@ -62,41 +65,48 @@ fun GameListScreen(
 
     Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (state.status) {
-            LoadStatus.LOADING -> LoadingScreen(message = "Memuat katalog game…")
+            LoadStatus.LOADING -> LoadingScreen(message = "Loading games…")
             LoadStatus.ERROR -> ErrorScreen(
-                message = state.errorMessage ?: "Gagal memuat data",
+                message = state.errorMessage ?: "Failed to load data",
                 onRetry = viewModel::loadGames
             )
             LoadStatus.SUCCESS -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 32.dp)
+                    contentPadding = PaddingValues(bottom = 130.dp)
                 ) {
-                    // ---------- Header hero ----------
+                    // ---------- Hero ----------
                     item {
                         Box {
                             SkyBackdrop(tall = true)
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 20.dp)
-                                    .padding(top = 28.dp, bottom = 16.dp)
+                                    .statusBarsPadding()
                             ) {
                                 Text(
-                                    text = "BoardGO",
-                                    style = MaterialTheme.typography.displayLarge,
-                                    color = androidx.compose.ui.graphics.Color.White
+                                    text = "BOARDGO",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    modifier = Modifier.padding(start = 20.dp, top = 24.dp)
                                 )
                                 Text(
-                                    text = "Temukan meja untuk bermain hari ini",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f)
+                                    text = "FIND A TABLE",
+                                    style = MaterialTheme.typography.displayLarge,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(start = 20.dp, top = 8.dp)
+                                )
+                                Text(
+                                    text = "IN 30 SEC · 12 GAMES · 8 VENUES",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = BoardGoColors.Meeple,
+                                    modifier = Modifier.padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
                                 )
                             }
                         }
                     }
 
-                    // ---------- Search field ----------
+                    // ---------- Search ----------
                     item {
                         OutlinedTextField(
                             value = state.searchQuery,
@@ -105,7 +115,7 @@ fun GameListScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 20.dp),
                             placeholder = {
-                                Text("Cari game…", style = MaterialTheme.typography.bodyMedium)
+                                Text("Search games…", style = MaterialTheme.typography.bodyMedium)
                             },
                             leadingIcon = {
                                 Icon(
@@ -125,12 +135,12 @@ fun GameListScreen(
                         )
                     }
 
-                    // ---------- Filter kategori (horizontal) ----------
+                    // ---------- Filter kategori ----------
                     item {
-                    SectionLabel(
-                        text = "Kategori",
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
+                        SectionLabel(
+                            text = "Category",
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        )
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -148,10 +158,10 @@ fun GameListScreen(
                         }
                     }
 
-                    // ---------- Daftar game (LAZY COLUMN) ----------
+                    // ---------- Daftar game ----------
                     item {
                         SectionLabel(
-                            text = "${state.filteredGames.size} game ditemukan",
+                            text = "${state.filteredGames.size} games found",
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
@@ -159,7 +169,7 @@ fun GameListScreen(
                     if (state.filteredGames.isEmpty()) {
                         item {
                             EmptyState(
-                                message = "Tidak ada game yang cocok dengan pencarianmu.",
+                                message = "No games match your search.",
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 48.dp)
                             )
                         }
@@ -181,7 +191,7 @@ fun GameListScreen(
     }
 }
 
-/** Satu baris item game di dalam LazyColumn. */
+/** Satu baris kartu game (cover foto + nama Anton uppercase + meta mono). */
 @Composable
 fun GameListItem(
     game: Game,
@@ -193,47 +203,33 @@ fun GameListItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
-            .padding(14.dp),
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // "Cover" game digambar dari gradient + inisial (tidak memakai gambar asli)
-        Box(
-            modifier = Modifier
-                .size(62.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    Brush.linearGradient(
-                        listOf(
-                            BoardGoColors.SkyDeep,
-                            MaterialTheme.colorScheme.primary
-                        )
-                    )
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = game.name.take(2).uppercase(),
-                style = MaterialTheme.typography.titleLarge,
-                color = androidx.compose.ui.graphics.Color.White
-            )
-        }
+        GameCover(
+            gameId = game.id,
+            name = game.name,
+            modifier = Modifier.size(66.dp)
+        )
 
         Spacer(Modifier.width(14.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = game.name,
+                text = game.name.uppercase(),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(Modifier.height(4.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                InfoPill(text = game.players + " pemain")
-                InfoPill(text = game.duration)
-            }
+            Spacer(Modifier.height(5.dp))
+            Text(
+                text = "${game.players} PLAYERS · ${game.duration.uppercase()}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.height(6.dp))
             Text(
                 text = game.category.label.uppercase(),
@@ -241,10 +237,16 @@ fun GameListItem(
                 color = MaterialTheme.colorScheme.primary
             )
         }
+
+        Text(
+            text = "›",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
-/** Tampilan saat hasil filter kosong. */
+/** Tampilan saat filter kosong. */
 @Composable
 fun EmptyState(
     message: String,

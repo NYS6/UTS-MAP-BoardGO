@@ -1,6 +1,7 @@
 package id.boardgo.app.ui.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,30 +29,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.boardgo.app.data.DummyData
-import id.boardgo.app.ui.components.AvatarStack
-import id.boardgo.app.ui.components.InfoPill
+import id.boardgo.app.ui.components.BoardGoGhostButton
+import id.boardgo.app.ui.components.GameCover
 import id.boardgo.app.ui.components.PlayerAvatar
 import id.boardgo.app.ui.components.SectionLabel
 import id.boardgo.app.ui.components.SkyBackdrop
-import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
 /**
- * ====================== LAYAR 5: PROFIL / BERANDA =========================
- * Layar tambahan (kriteria "Layar Bebas") berisi profil pengguna,
- * statistik, game favorit, dan sesi yang diikuti.
+ * ========================== LAYAR PROFIL ==================================
+ * Meniru layar ME pada web app: avatar bulat + nama Anton uppercase,
+ * stat card (rating / games / favorites), bio, tombol Edit & Log out,
+ * daftar Favorite Games.
  * =========================================================================
  */
 @Composable
 fun ProfileScreen(
     viewModel: BoardGOViewModel,
     onGameClick: (String) -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.profileState.collectAsStateWithLifecycle()
@@ -59,118 +61,154 @@ fun ProfileScreen(
     Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 32.dp)
+            contentPadding = PaddingValues(bottom = 130.dp)
         ) {
-            // ---------- Header ----------
+            // ---------- Header hero ----------
             item {
                 Box {
                     SkyBackdrop(tall = true)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 30.dp, bottom = 20.dp)
+                            .statusBarsPadding(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(72.dp)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(Color.White.copy(alpha = 0.2f))
-                                    .padding(4.dp)
-                            ) {
-                                PlayerAvatar(
-                                    playerId = DummyData.CURRENT_USER_ID,
-                                    size = 64
-                                )
-                            }
-                            Spacer(Modifier.width(14.dp))
-                            Column {
-                                Text(
-                                    text = me?.name ?: "-",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "${me?.area ?: "-"} · ${me?.level?.label ?: "-"}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.85f)
-                                )
-                            }
+                        Spacer(Modifier.height(20.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(88.dp)
+                                .clip(CircleShapeRound)
+                                .background(Color.White)
+                                .padding(3.dp)
+                        ) {
+                            PlayerAvatar(
+                                playerId = DummyData.CURRENT_USER_ID,
+                                size = 88
+                            )
                         }
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = (me?.name ?: "-").uppercase(),
+                            style = MaterialTheme.typography.displaySmall,
+                            color = Color.White
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "${(me?.area ?: "-").uppercase()} · ${(me?.level?.label ?: "-").uppercase()}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = BoardGoColors.Meeple
+                        )
                     }
                 }
             }
 
-            // ---------- Statistik ----------
+            // ---------- Stat card ----------
             item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    StatCard(
-                        value = "${me?.rating ?: "0"}",
-                        label = "Rating",
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatCard(
-                        value = "${me?.gamesPlayed ?: 0}",
-                        label = "Game",
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatCard(
-                        value = "${state.joinedSessions.size}",
-                        label = "Sesi",
-                        modifier = Modifier.weight(1f)
-                    )
+                    StatCard(value = "${me?.rating ?: "0"}", label = "RATING", modifier = Modifier.weight(1f))
+                    StatCard(value = "${me?.gamesPlayed ?: 0}", label = "GAMES", modifier = Modifier.weight(1f))
+                    StatCard(value = "${state.favoriteGames.size}", label = "FAVORITES", modifier = Modifier.weight(1f))
                 }
             }
 
             // ---------- Bio ----------
             item {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-                    Text(
-                        text = "Tentang saya",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                Text(
+                    text = me?.bio ?: "-",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)
+                        .padding(bottom = 16.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+
+            // ---------- Tombol aksi ----------
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    BoardGoGhostButton(
+                        text = "Edit profile",
+                        onClick = { /* mockup: tidak ada backend */ },
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = me?.bio ?: "-",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    BoardGoGhostButton(
+                        text = "Log out",
+                        onClick = onLogout,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
 
-            // ---------- Game favorit ----------
+            // ---------- Favorite games ----------
             item {
                 SectionLabel(
-                    text = "Game favorit",
+                    text = "Favorite games",
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
             items(state.favoriteGames, key = { it.id }) { game ->
-                FavoriteRow(
-                    name = game.name,
-                    meta = "${game.category.label} · ${game.duration}",
-                    onClick = { onGameClick(game.id) }
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 5.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+                        .clickable { onGameClick(game.id) }
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    GameCover(
+                        gameId = game.id,
+                        name = game.name,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = game.name.uppercase(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "${game.category.label.uppercase()} · ${game.duration.uppercase()}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        Icons.Filled.Star,
+                        contentDescription = "Favorite",
+                        modifier = Modifier.size(18.dp),
+                        tint = BoardGoColors.Meeple
+                    )
+                }
             }
 
             // ---------- Sesi yang diikuti ----------
             item {
                 SectionLabel(
-                    text = "Sesi yang diikuti (${state.joinedSessions.size})",
+                    text = "Joined sessions (${state.joinedSessions.size})",
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
             if (state.joinedSessions.isEmpty()) {
                 item {
                     Text(
-                        text = "Belum ikut sesi apa pun. Yuk host yang pertama!",
+                        text = "No upcoming sessions yet — host the first one!",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
@@ -183,28 +221,29 @@ fun ProfileScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 6.dp)
+                            .padding(horizontal = 20.dp, vertical = 5.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surface)
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                             .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = game?.name ?: "-",
-                                style = MaterialTheme.typography.titleMedium,
+                                text = (game?.name ?: "-").uppercase(),
+                                style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = "${session.day} ${session.time} · ${venue?.name ?: "-"}",
-                                style = MaterialTheme.typography.bodySmall,
+                                text = "${session.day.uppercase()} ${session.time} · ${venue?.name ?: "-"}",
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(Modifier.height(8.dp))
-                            AvatarStack(playerIds = session.joinedPlayerIds)
                         }
-                        InfoPill(text = session.fee)
+                        id.boardgo.app.ui.components.SeatPill(
+                            seatsLeft = session.maxPlayers - session.joinedPlayerIds.size
+                        )
                     }
                 }
             }
@@ -212,7 +251,10 @@ fun ProfileScreen(
     }
 }
 
-/** Kartu statistik angka besar. */
+/** Lingkaran. */
+private val CircleShapeRound = androidx.compose.foundation.shape.CircleShape
+
+/** Kartu statistik (nilai Anton + label mono). */
 @Composable
 private fun StatCard(
     value: String,
@@ -223,7 +265,8 @@ private fun StatCard(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 16.dp),
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
+            .padding(vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -233,48 +276,9 @@ private fun StatCard(
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            text = label.uppercase(),
+            text = label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    }
-}
-
-/** Baris game favorit. */
-@Composable
-private fun FavoriteRow(
-    name: String,
-    meta: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable(onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            Icons.Filled.Star,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp),
-            tint = BoardGoColors.Meeple
-        )
-        Spacer(Modifier.width(12.dp))
-        Column {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = meta,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
     }
 }

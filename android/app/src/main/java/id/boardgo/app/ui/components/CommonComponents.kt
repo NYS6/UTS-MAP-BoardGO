@@ -1,6 +1,7 @@
 package id.boardgo.app.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,32 +33,113 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import id.boardgo.app.R
 import id.boardgo.app.data.DummyData
 import id.boardgo.app.ui.theme.BoardGoColors
 
 /**
- * Komponen UI bersama (reuse) untuk seluruh layar BoardGO.
+ * Komponen UI bersama BoardGO — design mengikuti web app asli:
+ * kartu surface + ring tipis, label mono uppercase, pill status kursi,
+ * cover foto game asli.
  */
 
-/** Latar sky gradient seperti header web app. */
-@Composable
-fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(if (tall) 320.dp else 200.dp)
-            .background(
-                Brush.verticalGradient(
-                    listOf(BoardGoColors.SkyDeep, BoardGoColors.Sky, BoardGoColors.Background)
-                )
-            )
+/** Pemetaan gameId → foto cover asli (diambil dari repo web). */
+object GameCovers {
+    private val covers = mapOf(
+        "catan" to R.drawable.game_catan,
+        "wingspan" to R.drawable.game_wingspan,
+        "azul" to R.drawable.game_azul,
+        "splendor" to R.drawable.game_splendor,
+        "ticket" to R.drawable.game_ticket,
+        "mars" to R.drawable.game_mars,
+        "mahjong" to R.drawable.game_mahjong,
+        "chess" to R.drawable.game_chess,
+        "checkers" to R.drawable.game_checkers,
+        "monopoly" to R.drawable.game_monopoly,
+        "scrabble" to R.drawable.game_scrabble,
+        "werewolf" to R.drawable.game_werewolf
     )
+
+    fun coverOf(gameId: String): Int? = covers[gameId]
 }
 
-/** Top bar dengan tombol back opsional. */
+/** Cover foto game (fallback: gradient + inisial bila tidak ada foto). */
+@Composable
+fun GameCover(
+    gameId: String,
+    name: String,
+    modifier: Modifier = Modifier
+) {
+    val coverRes = GameCovers.coverOf(gameId)
+    Box(
+        modifier = modifier.clip(RoundedCornerShape(14.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (coverRes != null) {
+            Image(
+                painter = painterResource(coverRes),
+                contentDescription = name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            listOf(BoardGoColors.SkyDeep, MaterialTheme.colorScheme.primary)
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = name.take(2).uppercase(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+/** Latar sky gradient (hero backdrop), meniru web app. */
+@Composable
+fun SkyBackdrop(modifier: Modifier = Modifier, tall: Boolean = false) {
+    Box(modifier = modifier.fillMaxWidth().height(if (tall) 300.dp else 190.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(BoardGoColors.SkyDeep, BoardGoColors.Sky, BoardGoColors.Background)
+                    )
+                )
+        )
+        // "Glass" circles versi sederhana
+        Box(
+            modifier = Modifier
+                .offset(x = (-40).dp, y = 40.dp)
+                .size(150.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.14f))
+        )
+        Box(
+            modifier = Modifier
+                .offset(x = 240.dp, y = 10.dp)
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(BoardGoColors.Primary.copy(alpha = 0.28f))
+        )
+    }
+}
+
+/** Top bar: judul selalu UPPERCASE Anton (sama seperti web app). */
 @Composable
 fun TopBar(
     title: String,
@@ -77,19 +159,19 @@ fun TopBar(
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(38.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Kembali",
+                    contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         } else {
-            Spacer(Modifier.width(40.dp))
+            Spacer(Modifier.width(38.dp))
         }
 
         Text(
@@ -105,7 +187,7 @@ fun TopBar(
     }
 }
 
-/** Chip pilihan (dipakai filter & form). */
+/** Chip pilihan pill (filter & pilihan form) — aktif = oranye. */
 @Composable
 fun BoardGoChip(
     text: String,
@@ -127,13 +209,13 @@ fun BoardGoChip(
                 shape = RoundedCornerShape(50)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp)
+            .padding(horizontal = 13.dp, vertical = 7.dp)
     ) {
         Text(text = text, style = MaterialTheme.typography.labelLarge, color = fg)
     }
 }
 
-/** Label kecil bergaya monospace (section label web app). */
+/** Section label mono uppercase + garis tipis (persis pola web app). */
 @Composable
 fun SectionLabel(
     text: String,
@@ -162,7 +244,54 @@ fun SectionLabel(
     }
 }
 
-/** Avatar pemain bulat dengan warna p1–p4. */
+/** Pill metadata kecil (ring outline, mono) — meniru tag web app. */
+@Composable
+fun InfoPill(
+    text: String,
+    modifier: Modifier = Modifier,
+    accent: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(50))
+            .padding(horizontal = 9.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            color = accent
+        )
+    }
+}
+
+/**
+ * Pill status kursi: "FILLING FAST · 1 SEAT" (oranye),
+ * "FULL" (merah) / "FREE" (hijau) — meniru badge di web app.
+ */
+@Composable
+fun SeatPill(
+    seatsLeft: Int,
+    modifier: Modifier = Modifier
+) {
+    val (label, fg, bg) = when {
+        seatsLeft <= 0 -> Triple("FULL", BoardGoColors.Destructive, BoardGoColors.Destructive.copy(alpha = 0.10f))
+        seatsLeft == 1 -> Triple("FILLING FAST · 1 SEAT", BoardGoColors.Primary, BoardGoColors.Primary.copy(alpha = 0.10f))
+        else -> Triple("$seatsLeft SEATS OPEN", BoardGoColors.Success, BoardGoColors.Success.copy(alpha = 0.10f))
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(bg)
+            .padding(horizontal = 9.dp, vertical = 4.dp)
+    ) {
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = fg)
+    }
+}
+
+/** Avatar pemain bulat (warna p1–p4). */
 @Composable
 fun PlayerAvatar(
     playerId: String,
@@ -184,15 +313,11 @@ fun PlayerAvatar(
             .background(color),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = initial,
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.White
-        )
+        Text(text = initial, style = MaterialTheme.typography.titleMedium, color = Color.White)
     }
 }
 
-/** Tumpukan avatar pemain yang saling menumpuk. */
+/** Tumpukan avatar saling menimpa (offset, bukan padding negatif). */
 @Composable
 fun AvatarStack(
     playerIds: List<String>,
@@ -201,8 +326,6 @@ fun AvatarStack(
 ) {
     Row(modifier = modifier) {
         playerIds.take(4).forEachIndexed { index, id ->
-            // Catatan: offset (bukan padding) agar boleh negatif — padding negatif
-            // akan crash dengan "Padding must be non-negative".
             Box(modifier = Modifier.offset(x = if (index == 0) 0.dp else (-8).dp)) {
                 Box(
                     modifier = Modifier
@@ -219,7 +342,7 @@ fun AvatarStack(
 
 /** Layar loading penuh. */
 @Composable
-fun LoadingScreen(message: String = "Memuat data…", modifier: Modifier = Modifier) {
+fun LoadingScreen(message: String = "Loading…", modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -233,7 +356,7 @@ fun LoadingScreen(message: String = "Memuat data…", modifier: Modifier = Modif
     }
 }
 
-/** Layar error dengan tombol coba lagi. */
+/** Layar error + tombol coba lagi. */
 @Composable
 fun ErrorScreen(
     message: String,
@@ -246,7 +369,7 @@ fun ErrorScreen(
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
-                text = "Oops!",
+                text = "OOPS!",
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -258,12 +381,16 @@ fun ErrorScreen(
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(20.dp))
-            BoardGoPrimaryButton(text = "Coba lagi", onClick = onRetry, modifier = Modifier.width(180.dp))
+            BoardGoPrimaryButton(
+                text = "Try again",
+                onClick = onRetry,
+                modifier = Modifier.width(180.dp)
+            )
         }
     }
 }
 
-/** Tombol utama brand (oranye penuh). */
+/** Tombol utama oranye. */
 @Composable
 fun BoardGoPrimaryButton(
     text: String,
@@ -296,7 +423,7 @@ fun BoardGoPrimaryButton(
     }
 }
 
-/** Tombol sekunder (outline). */
+/** Tombol sekunder (putih/outline). */
 @Composable
 fun BoardGoGhostButton(
     text: String,
@@ -318,28 +445,7 @@ fun BoardGoGhostButton(
     }
 }
 
-/** Kotak info kecil (metadata). */
-@Composable
-fun InfoPill(
-    text: String,
-    modifier: Modifier = Modifier,
-    accent: Color = MaterialTheme.colorScheme.onSurfaceVariant
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(50))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 10.dp, vertical = 5.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium,
-            color = accent
-        )
-    }
-}
-
-/** Pesan sukses/feedback yang muncul sebentar. */
+/** Banner sukses yang muncul sebentar. */
 @Composable
 fun SuccessBanner(
     visible: Boolean,

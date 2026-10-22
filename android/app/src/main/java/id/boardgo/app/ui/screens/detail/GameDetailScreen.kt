@@ -1,6 +1,7 @@
 package id.boardgo.app.ui.screens.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +24,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.SentimentDissatisfied
+import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.boardgo.app.data.DummyData
@@ -44,18 +45,20 @@ import id.boardgo.app.ui.components.AvatarStack
 import id.boardgo.app.ui.components.BoardGoGhostButton
 import id.boardgo.app.ui.components.BoardGoPrimaryButton
 import id.boardgo.app.ui.components.ErrorScreen
+import id.boardgo.app.ui.components.GameCover
 import id.boardgo.app.ui.components.InfoPill
 import id.boardgo.app.ui.components.LoadingScreen
-import id.boardgo.app.ui.components.PlayerAvatar
+import id.boardgo.app.ui.components.SeatPill
 import id.boardgo.app.ui.components.SectionLabel
-import id.boardgo.app.ui.components.TopBar
 import id.boardgo.app.ui.theme.BoardGoColors
 import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 import id.boardgo.app.ui.viewmodel.LoadStatus
 
 /**
- * ====================== LAYAR 2: DETAIL GAME =============================
- * Menerima ARGUMEN "gameId" dari layar List (wajib passing argument).
+ * ====================== LAYAR DETAIL GAME =================================
+ * Meniru session detail web app: cover foto besar, nama Anton uppercase,
+ * stat blocks (players / time / difficulty), sesi + seat pill + pemain.
+ * Menerima ARGUMEN "gameId" dari layar List.
  * =========================================================================
  */
 @Composable
@@ -68,16 +71,15 @@ fun GameDetailScreen(
 ) {
     val state by viewModel.detailState.collectAsStateWithLifecycle()
 
-    // Muat data detail ketika argumen gameId diterima
     LaunchedEffect(gameId) {
         viewModel.loadGameDetail(gameId)
     }
 
     Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (state.status) {
-            LoadStatus.LOADING -> LoadingScreen(message = "Memuat detail game…")
+            LoadStatus.LOADING -> LoadingScreen(message = "Loading game…")
             LoadStatus.ERROR -> ErrorScreen(
-                message = state.errorMessage ?: "Gagal memuat detail",
+                message = state.errorMessage ?: "Failed to load game",
                 onRetry = { viewModel.loadGameDetail(gameId) }
             )
             LoadStatus.SUCCESS -> {
@@ -85,40 +87,39 @@ fun GameDetailScreen(
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 120.dp)
+                    contentPadding = PaddingValues(bottom = 200.dp)
                 ) {
-                    // ---------- Hero cover ----------
+                    // ---------- Cover besar ----------
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                                .background(
-                                    Brush.linearGradient(
-                                        listOf(
-                                            BoardGoColors.SkyDeep,
-                                            MaterialTheme.colorScheme.primary
+                        Box {
+                            GameCover(
+                                gameId = game.id,
+                                name = game.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp)
+                            )
+                            // Scrim gradasi agar tombol back terbaca
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(90.dp)
+                                    .align(Alignment.TopCenter)
+                                    .background(
+                                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                                            listOf(Color.Black.copy(alpha = 0.35f), Color.Transparent)
                                         )
                                     )
-                                )
-                        ) {
-                            Text(
-                                text = game.name.take(2).uppercase(),
-                                style = MaterialTheme.typography.displayLarge,
-                                color = Color.White.copy(alpha = 0.9f),
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .padding(top = 20.dp)
                             )
                         }
                     }
 
-                    // ---------- Judul + metadata ----------
+                    // ---------- Judul + favorit ----------
                     item {
                         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = game.name,
+                                    text = game.name.uppercase(),
                                     style = MaterialTheme.typography.displaySmall,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f)
@@ -127,7 +128,7 @@ fun GameDetailScreen(
                                     Icon(
                                         imageVector = if (state.isFavorite) Icons.Filled.Favorite
                                         else Icons.Filled.FavoriteBorder,
-                                        contentDescription = "Favorit",
+                                        contentDescription = "Favorite",
                                         tint = if (state.isFavorite) BoardGoColors.Primary
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -137,19 +138,47 @@ fun GameDetailScreen(
                             Spacer(Modifier.height(10.dp))
 
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                InfoPill(text = game.category.label, accent = MaterialTheme.colorScheme.primary)
-                                InfoPill(text = game.difficulty.label)
+                                InfoPill(
+                                    text = game.category.label.uppercase(),
+                                    accent = MaterialTheme.colorScheme.primary
+                                )
+                                InfoPill(text = game.difficulty.label.uppercase())
                             }
+                        }
+                    }
 
-                            Spacer(Modifier.height(14.dp))
+                    // ---------- Stat blocks ----------
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            StatBlock(
+                                icon = Icons.Filled.Groups,
+                                value = game.players,
+                                label = "PLAYERS",
+                                modifier = Modifier.weight(1f)
+                            )
+                            StatBlock(
+                                icon = Icons.Filled.Schedule,
+                                value = game.duration.replace(" min", "").uppercase(),
+                                label = "MINUTES",
+                                modifier = Modifier.weight(1f)
+                            )
+                            StatBlock(
+                                icon = Icons.Filled.SignalCellularAlt,
+                                value = game.difficulty.label,
+                                label = "SKILL",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
 
-                            Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-                                MetaItem(Icons.Filled.Groups, game.players + " pemain")
-                                MetaItem(Icons.Filled.Schedule, game.duration)
-                            }
-
-                            Spacer(Modifier.height(16.dp))
-
+                    // ---------- Deskripsi ----------
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                             Text(
                                 text = game.description,
                                 style = MaterialTheme.typography.bodyLarge,
@@ -161,32 +190,22 @@ fun GameDetailScreen(
                     // ---------- Sesi tersedia ----------
                     item {
                         SectionLabel(
-                            text = "Sesi tersedia (${state.sessions.size})",
+                            text = "Tables available (${state.sessions.size})",
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
 
                     if (state.sessions.isEmpty()) {
                         item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 40.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.SentimentDissatisfied,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(40.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            Text(
+                                text = "No open tables for this game yet.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(
+                                    horizontal = 20.dp,
+                                    vertical = 32.dp
                                 )
-                                Spacer(Modifier.height(10.dp))
-                                Text(
-                                    text = "Belum ada sesi untuk game ini.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            )
                         }
                     } else {
                         items(state.sessions, key = { it.id }) { session ->
@@ -198,75 +217,95 @@ fun GameDetailScreen(
                     }
                 }
 
-                // ---------- Tombol aksi (fixed di bawah, di atas bottom nav 92dp) ----------
+                // ---------- Tombol aksi (di atas bottom nav) ----------
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surface)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                        )
                         .padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 104.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         BoardGoGhostButton(
-                            text = "Kembali",
+                            text = "Back",
                             onClick = onBack,
-                            modifier = Modifier.width(120.dp)
+                            modifier = Modifier.width(110.dp)
                         )
                         BoardGoPrimaryButton(
-                            text = "Host sesi",
+                            text = "Host a session",
                             onClick = { onCreateSession(game.id) },
                             modifier = Modifier.weight(1f)
                         )
                     }
                 }
-            }
-        }
 
-        // Tombol back mengambang di atas hero (dengan status bar padding)
-        if (state.status == LoadStatus.SUCCESS) {
-            Box(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(start = 20.dp, top = 8.dp)
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .clickable(onClick = onBack),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "←",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                // ---------- Tombol back mengambang ----------
+                Box(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(start = 20.dp, top = 8.dp)
+                        .size(38.dp)
+                        .clip(CircleShapeRounded)
+                        .background(Color.White.copy(alpha = 0.92f))
+                        .clickable(onClick = onBack),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "←",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
 }
 
-/** Metadata kecil dengan ikon. */
+/** Bentuk lingkaran untuk tombol back. */
+private val CircleShapeRounded = RoundedCornerShape(50)
+
+/** Stat block: ikon + nilai besar + label mono. */
 @Composable
-private fun MetaItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String
+private fun StatBlock(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+            .padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.primary
         )
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.height(6.dp))
         Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
-/** Kartu sesi di layar detail. */
+/** Kartu sesi (table) di layar detail — meniru web app. */
 @Composable
 private fun SessionCard(session: GameSession, modifier: Modifier = Modifier) {
     val venue = DummyData.venueById(session.venueId)
@@ -278,33 +317,39 @@ private fun SessionCard(session: GameSession, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
             .padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "${session.day} · ${session.time}",
-                style = MaterialTheme.typography.titleMedium,
+                text = "${session.day.uppercase()} · ${session.time}",
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
-            InfoPill(
-                text = if (seatsLeft > 0) "$seatsLeft kursi kosong" else "Penuh",
-                accent = if (seatsLeft > 0) BoardGoColors.Success else BoardGoColors.Destructive
-            )
+            SeatPill(seatsLeft = seatsLeft)
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            text = "${venue?.name ?: "-"} · ${venue?.area ?: "-"}",
-            style = MaterialTheme.typography.bodyMedium,
+            text = "${venue?.name ?: "-"} · ${venue?.area ?: "-"} · ${venue?.distanceKm ?: "-"} KM AWAY",
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(Modifier.height(10.dp))
+        if (session.note.isNotBlank()) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "“${session.note}”",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             AvatarStack(playerIds = session.joinedPlayerIds)
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "Host: ${host?.name ?: "-"}",
-                style = MaterialTheme.typography.labelMedium,
+                text = "HOSTED BY ${host?.name?.uppercase() ?: "-"}",
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.weight(1f))

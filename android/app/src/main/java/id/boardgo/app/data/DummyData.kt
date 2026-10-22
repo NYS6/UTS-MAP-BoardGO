@@ -9,15 +9,14 @@ import id.boardgo.app.data.model.Player
 import id.boardgo.app.data.model.Venue
 
 /**
- * Seluruh data di aplikasi ini DUMMY (sesuai ketentuan UTS:
- * tanpa backend/database sungguhan). Data di-porting dari
- * src/lib/data.ts pada versi web app BoardGO.
+ * Seluruh data DUMMY (tanpa backend/database). Data di-porting dari
+ * src/lib/data.ts pada web app BoardGO.
  */
 
 object DummyData {
 
     // ---------------------------------------------------------------------
-    // Katalog game (12 game, sama persis dengan web app)
+    // Katalog game (12 game, sama dengan web app)
     // ---------------------------------------------------------------------
     val games: List<Game> = listOf(
         Game("catan", "Catan", "Trade, build and settle the island of Catan. Gather resources and outmaneuver rivals.", "3–4", "75 min", Difficulty.MEDIUM, Category.STRATEGY),
@@ -35,7 +34,7 @@ object DummyData {
     )
 
     // ---------------------------------------------------------------------
-    // Venue (mockup GPS: distanceKm dipakai untuk "radius pencarian")
+    // Venue (mockup GPS: distanceKm dipakai untuk radius pencarian)
     // ---------------------------------------------------------------------
     val venues: List<Venue> = listOf(
         Venue("v1", "Coffee & Dice", "BSD", 0.6, 40.0),
@@ -63,7 +62,7 @@ object DummyData {
     )
 
     // ---------------------------------------------------------------------
-    // Sesi bermain awal
+    // Sesi bermain (s7 = sesi lampau, meniru web app)
     // ---------------------------------------------------------------------
     val sessions: List<GameSession> = listOf(
         GameSession("s1", "catan", "v1", "u2", "Tonight", "19:30", 4, listOf("u2", "u1", "u3"), Level.CASUAL, "Base game + Seafarers if we're quick. Beginners welcome!", "Free"),
@@ -77,22 +76,29 @@ object DummyData {
         GameSession("s10", "checkers", "v7", "u2", "Sun", "10:00", 2, listOf("u2"), Level.BEGINNER, "Relaxed Sunday morning game.", "Free"),
         GameSession("s11", "monopoly", "v8", "u5", "Sat", "14:00", 6, listOf("u5", "u1", "u4"), Level.CASUAL, "House rules: Free Parking jackpot.", "Rp20k"),
         GameSession("s12", "werewolf", "v6", "u1", "Sat", "19:00", 10, listOf("u1", "u2", "u4", "u5"), Level.BEGINNER, "Big group night, moderator provided.", "Rp10k"),
-        GameSession("s13", "scrabble", "v3", "u4", "Sun", "16:00", 4, listOf("u4"), Level.CASUAL, "English dictionary, timer optional.", "Free")
+        GameSession("s13", "scrabble", "v3", "u4", "Sun", "16:00", 4, listOf("u4"), Level.CASUAL, "English dictionary, timer optional.", "Free"),
+        GameSession("s7", "catan", "v2", "me", "Last Fri", "19:00", 4, listOf("me", "u1", "u2", "u4"), Level.CASUAL, "Done! Great games.", "Free")
     )
 
-    // Opsi form (dipakai layar Form/Input)
+    /** Sesi yang sudah lewat (untuk tab "Past" di My Games). */
+    val pastSessionIds: Set<String> = setOf("s7")
+
+    // Opsi form
     val dayOptions = listOf("Tonight", "Tomorrow", "Sat", "Sun")
     val timeOptions = listOf("13:00", "16:00", "18:00", "19:30", "21:00")
     val feeOptions = listOf("Free", "Rp15k", "Rp25k", "Rp30k")
 
-    // Warna avatar pemain (p1–p4), disimpan sebagai index agar UI bebas warna
+    // Warna avatar pemain p1–p4
     val playerColors = listOf(0xFFC07C56, 0xFF4B8A63, 0xFF557CAF, 0xFFA864A2)
 
     // ---------------------------------------------------------------------
-    // Helper lookup (mirip getGame/getVenue/getPlayer di web app)
+    // Helper lookup
     // ---------------------------------------------------------------------
     fun gameById(id: String): Game? = games.find { it.id == id }
     fun venueById(id: String): Venue? = venues.find { it.id == id }
     fun playerById(id: String): Player? = players.find { it.id == id }
-    fun sessionsForGame(gameId: String): List<GameSession> = sessions.filter { it.gameId == gameId }
+
+    /** Sesi AKTIF (belum lewat) untuk sebuah game. */
+    fun sessionsForGame(gameId: String): List<GameSession> =
+        sessions.filter { it.gameId == gameId && it.id !in pastSessionIds }
 }

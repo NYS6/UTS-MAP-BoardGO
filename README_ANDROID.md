@@ -9,6 +9,16 @@ BoardGO adalah aplikasi katalog & komunitas board game. Repo ini berisi **dua ve
 
 Project Android berada di folder **`android/`** agar kedua versi tidak saling menimpa.
 
+## 🎨 Design
+
+UI Android mengikuti design web app asli secara detail:
+- **Font asli**: Anton (judul display UPPERCASE) + JetBrains Mono (label kecil) — di-bundle di `res/font/`
+- **Foto game asli** dari repo web (`res/drawable/game_*.jpg`) untuk cover/hero/thumbnail
+- Palet warna oranye `#F84F2F` + sky blue + latar `#E5ECF3` (konversi OKLCH dari `styles.css`)
+- Bottom nav pill melayang (HOME · MINE · + · ME · FITUR), kartu surface + ring tipis,
+  pill status kursi ("FILLING FAST · 1 SEAT"), section label mono + garis tipis
+- 7 layar: Welcome, Discover/List, Detail, Form, My Games, Fitur Native (mockup), Profil
+
 ## 🚀 Menjalankan versi Android
 
 ```bash
