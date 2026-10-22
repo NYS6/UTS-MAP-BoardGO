@@ -15,6 +15,7 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyGamesRouteImport } from './routes/my-games'
+import { Route as NearbyRouteImport } from './routes/nearby'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -53,6 +54,11 @@ const LoginRoute = LoginRouteImport.update({
 const MyGamesRoute = MyGamesRouteImport.update({
   id: '/my-games',
   path: '/my-games',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NearbyRoute = NearbyRouteImport.update({
+  id: '/nearby',
+  path: '/nearby',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/my-games': typeof MyGamesRoute
+  '/nearby': typeof NearbyRoute
   '/notifications': typeof NotificationsRoute
   '/profile-setup': typeof ProfileSetupRoute
   '/register': typeof RegisterRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/my-games': typeof MyGamesRoute
+  '/nearby': typeof NearbyRoute
   '/notifications': typeof NotificationsRoute
   '/profile-setup': typeof ProfileSetupRoute
   '/register': typeof RegisterRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/my-games': typeof MyGamesRoute
+  '/nearby': typeof NearbyRoute
   '/notifications': typeof NotificationsRoute
   '/profile-setup': typeof ProfileSetupRoute
   '/register': typeof RegisterRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/my-games'
+    | '/nearby'
     | '/notifications'
     | '/profile-setup'
     | '/register'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/my-games'
+    | '/nearby'
     | '/notifications'
     | '/profile-setup'
     | '/register'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/my-games'
+    | '/nearby'
     | '/notifications'
     | '/profile-setup'
     | '/register'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   MyGamesRoute: typeof MyGamesRoute
+  NearbyRoute: typeof NearbyRoute
   NotificationsRoute: typeof NotificationsRoute
   ProfileSetupRoute: typeof ProfileSetupRoute
   RegisterRoute: typeof RegisterRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/my-games'
       fullPath: '/my-games'
       preLoaderRoute: typeof MyGamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nearby': {
+      id: '/nearby'
+      path: '/nearby'
+      fullPath: '/nearby'
+      preLoaderRoute: typeof NearbyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -342,6 +362,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   MyGamesRoute: MyGamesRoute,
+  NearbyRoute: NearbyRoute,
   NotificationsRoute: NotificationsRoute,
   ProfileSetupRoute: ProfileSetupRoute,
   RegisterRoute: RegisterRoute,
