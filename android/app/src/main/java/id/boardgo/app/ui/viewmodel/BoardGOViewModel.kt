@@ -45,12 +45,21 @@ data class HomeUiState(
                 (selectedChip == "All" || it.gameId == selectedChip)
         }
 
-    /** Kartu featured: sesi yang belum penuh & belum diikuti user. */
+    /**
+     * Kartu featured: MAHJONG & MONOPOLY diutamakan (game paling populer),
+     * lalu sesi lain yang belum penuh & belum diikuti user.
+     */
     val featured: GameSession?
-        get() = openSessions.find {
-            DummyData.CURRENT_USER_ID !in it.joinedPlayerIds &&
-                it.joinedPlayerIds.size < it.maxPlayers
-        } ?: openSessions.firstOrNull()
+        get() {
+            val eligible = openSessions.filter {
+                DummyData.CURRENT_USER_ID !in it.joinedPlayerIds &&
+                    it.joinedPlayerIds.size < it.maxPlayers
+            }
+            return eligible.find { it.gameId in DummyData.featuredGameIds }
+                ?: openSessions.find { it.gameId in DummyData.featuredGameIds }
+                ?: eligible.firstOrNull()
+                ?: openSessions.firstOrNull()
+        }
 
     val rest: List<GameSession>
         get() = openSessions.filter { it.id != featured?.id }
@@ -128,16 +137,18 @@ data class AuthUiState(
     val successTick: Int = 0   // bertambah tiap submit sukses -> layar navigasi
 )
 
-/** State layar Fitur Native (mockup GPS / QR / biometrik). */
-data class NativeFeatureUiState(
-    val isGpsLoading: Boolean = false,
-    val gpsErrorMessage: String? = null,
-    val currentLocation: String? = null,
-    val nearbyRadiusKm: Int = 5,
-    val isQrScanning: Boolean = false,
-    val qrScanResult: String? = null,
-    val isBioChecking: Boolean = false,
-    val biometricResult: String? = null
+/** Pesan chat pada sebuah sesi. */
+data class ChatMessage(
+    val id: String,
+    val senderId: String,          // "system" untuk pesan sistem
+    val text: String,
+    val time: String,
+    val system: Boolean = false
+)
+
+/** State layar Chat. */
+data class ChatUiState(
+    val messagesBySession: Map<String, List<ChatMessage>> = emptyMap()
 )
 
 /** State layar My Games (tab Upcoming / Past). */
@@ -163,8 +174,50 @@ class BoardGOViewModel : ViewModel() {
     private val _allSessions = MutableStateFlow(DummyData.sessions)
     val allSessions: StateFlow<List<GameSession>> = _allSessions.asStateFlow()
 
-    /** Join sesi (mockup) — memperbarui Home, My Games, Profil, Nearby. */
+    // =================== State CHAT ========================================
+    private val _chatState = MutableStateFlow(
+        ChatUiState(
+            messagesBySession = mapOf(
+                // Obrolan awal (meniru web app)
+                "s4" to listOf(
+                    ChatMessage("m1", "u3", "Hey! Prelude cards are packed 🔥", "10:02"),
+                    ChatMessage("m2", DummyData.CURRENT_USER_ID, "Nice, I'll bring chips", "10:05"),
+                    ChatMessage("m3", "u3", "See you Saturday at Meeple House", "10:06")
+                )
+            )
+        )
+    )
+    val chatState: StateFlow<ChatUiState> = _chatState.asStateFlow()
+
+    /** Daftar pesan sebuah sesi. */
+    fun chatMessages(sessionId: String): List<ChatMessage> =
+        _chatState.value.messagesBySession[sessionId].orEmpty()
+
+    /** Kirim pesan (mockup — dari user saat ini). */
+    fun sendChat(sessionId: String, text: String) {
+        val trimmed = text.trim()
+        if (trimmed.isEmpty()) return
+        val time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        _chatState.update { state ->
+            val current = state.messagesBySession[sessionId].orEmpty()
+            val msg = ChatMessage(
+                id = "m${System.currentTimeMillis()}",
+                senderId = DummyData.CURRENT_USER_ID,
+                text = trimmed,
+                time = time
+            )
+            state.copy(messagesBySession = state.messagesBySession + (sessionId to (current + msg)))
+        }
+    }
+
+    /** Join sesi (mockup) — memperbarui Home, My Games, Profil, Nearby, Chat. */
     fun joinSession(sessionId: String) {
+        val alreadyJoined = _allSessions.value
+            .find { it.id == sessionId }
+            ?.joinedPlayerIds
+            ?.contains(DummyData.CURRENT_USER_ID) == true
+
         _allSessions.update { list ->
             list.map { s ->
                 if (s.id == sessionId &&
@@ -175,6 +228,29 @@ class BoardGOViewModel : ViewModel() {
                 } else s
             }
         }
+
+        // Pesan sistem di chat (meniru web app: "You joined the table 🎲")
+        if (!alreadyJoined) {
+            val joinedNow = _allSessions.value.find { it.id == sessionId }
+                ?.joinedPlayerIds
+                ?.contains(DummyData.CURRENT_USER_ID) == true
+            if (joinedNow) {
+                _chatState.update { state ->
+                    val current = state.messagesBySession[sessionId].orEmpty()
+                    val msg = ChatMessage(
+                        id = "sys${System.currentTimeMillis()}",
+                        senderId = "system",
+                        text = "You joined the table 🎲",
+                        time = "",
+                        system = true
+                    )
+                    state.copy(
+                        messagesBySession = state.messagesBySession + (sessionId to (current + msg))
+                    )
+                }
+            }
+        }
+
         // Perbarui turunan
         _homeState.update { it.copy(sessions = _allSessions.value) }
         loadMyGames()
@@ -478,60 +554,6 @@ class BoardGOViewModel : ViewModel() {
         }
     }
 
-    // =================== State Fitur Native =================================
-    private val _nativeState = MutableStateFlow(NativeFeatureUiState())
-    val nativeState: StateFlow<NativeFeatureUiState> = _nativeState.asStateFlow()
-
-    fun mockFetchLocation() {
-        viewModelScope.launch {
-            _nativeState.update {
-                it.copy(isGpsLoading = true, gpsErrorMessage = null, currentLocation = null)
-            }
-            delay(1200)
-            val success = (0..4).random() != 0
-            if (success) {
-                _nativeState.update {
-                    it.copy(isGpsLoading = false, currentLocation = "BSD City · -6.3019, 106.6535")
-                }
-            } else {
-                _nativeState.update {
-                    it.copy(isGpsLoading = false, gpsErrorMessage = "Location unavailable. Try again.")
-                }
-            }
-        }
-    }
-
-    fun onNativeRadiusChange(radiusKm: Int) {
-        _nativeState.update { it.copy(nearbyRadiusKm = radiusKm) }
-    }
-
-    fun mockScanQr() {
-        viewModelScope.launch {
-            _nativeState.update { it.copy(isQrScanning = true, qrScanResult = null) }
-            delay(1500)
-            val codes = listOf("BG-CATAN-001", "BG-AZUL-042", "BG-WEREWOLF-013")
-            _nativeState.update { it.copy(isQrScanning = false, qrScanResult = codes.random()) }
-        }
-    }
-
-    fun clearQrResult() = _nativeState.update { it.copy(qrScanResult = null) }
-
-    fun mockAuthenticateBiometric() {
-        viewModelScope.launch {
-            _nativeState.update { it.copy(isBioChecking = true, biometricResult = null) }
-            delay(1400)
-            val success = (0..4).random() != 0
-            _nativeState.update {
-                it.copy(
-                    isBioChecking = false,
-                    biometricResult = if (success) "success" else "failed"
-                )
-            }
-        }
-    }
-
-    fun clearBiometricResult() = _nativeState.update { it.copy(biometricResult = null) }
-
     // =================== State My Games =====================================
     private val _myGamesState = MutableStateFlow(MyGamesUiState())
     val myGamesState: StateFlow<MyGamesUiState> = _myGamesState.asStateFlow()
@@ -561,7 +583,8 @@ class BoardGOViewModel : ViewModel() {
         _profileState.update {
             it.copy(
                 me = me,
-                favoriteGames = DummyData.games.filter { g -> g.id in listOf("catan", "mars") },
+                // Favorit: Mahjong & Monopoly (game utama)
+                favoriteGames = DummyData.games.filter { g -> g.id in DummyData.featuredGameIds },
                 joinedSessions = _allSessions.value.filter { s ->
                     DummyData.CURRENT_USER_ID in s.joinedPlayerIds &&
                         s.id !in DummyData.pastSessionIds

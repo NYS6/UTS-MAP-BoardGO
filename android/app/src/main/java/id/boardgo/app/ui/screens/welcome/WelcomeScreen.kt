@@ -92,9 +92,9 @@ fun WelcomeScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // Foto papan Catan (cover asli dari repo web)
+            // Foto papan Monopoly (game utama) dari repo web
             Image(
-                painter = painterResource(R.drawable.game_catan),
+                painter = painterResource(R.drawable.game_monopoly),
                 contentDescription = "Catan board",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

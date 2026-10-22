@@ -67,6 +67,7 @@ fun GameDetailScreen(
     viewModel: BoardGOViewModel,
     onBack: () -> Unit,
     onCreateSession: (String) -> Unit,
+    onOpenChat: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.detailState.collectAsStateWithLifecycle()
@@ -212,6 +213,7 @@ fun GameDetailScreen(
                             SessionCard(
                                 session = session,
                                 onJoin = { viewModel.joinSession(session.id) },
+                                onChat = { onOpenChat(session.id) },
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                             )
                         }
@@ -306,11 +308,12 @@ private fun StatBlock(
     }
 }
 
-/** Kartu sesi (table) di layar detail — meniru web app + tombol Join mockup. */
+/** Kartu sesi (table) di layar detail — meniru web app + Join & Open chat. */
 @Composable
 private fun SessionCard(
     session: GameSession,
     onJoin: () -> Unit,
+    onChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val venue = DummyData.venueById(session.venueId)
@@ -362,7 +365,7 @@ private fun SessionCard(
             InfoPill(text = session.fee)
         }
 
-        // Aksi Join (mockup — state tersimpan di ViewModel)
+        // Aksi Join (mockup — state tersimpan di ViewModel) + buka chat
         if (joined) {
             Spacer(Modifier.height(10.dp))
             Box(
@@ -396,5 +399,18 @@ private fun SessionCard(
                 )
             }
         }
+
+        // Buka chat sesi
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "open chat →",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .align(Alignment.End)
+                .clip(RoundedCornerShape(6.dp))
+                .clickable(onClick = onChat)
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        )
     }
 }

@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -49,11 +49,12 @@ import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 
 /**
  * ================== LAYAR REGISTER / LOGIN (AuthForm) =====================
- * Meniru AuthForm web app:
- *  - Register : judul "GRAB A SEAT" + Full name / Email / Password
- *  - Login    : judul "WELCOME BACK" + Email / Password
- * VALIDASI (kriteria UTS): nama wajib, email regex, password min 6 karakter,
- * keyboard email + password (toggle lihat password — state remember lokal).
+ * Meniru AuthForm web app — REVISI layout:
+ *  - Judul "GRAB A SEAT"/"WELCOME BACK" berada DI ATAS sky backdrop
+ *    (overlay, bukan di bawahnya) sehingga tidak menyatu dengan background
+ *    light mode maupun dark mode.
+ *  - Konten tidak terlalu bawah: judul + kartu langsung setelah top bar.
+ * VALIDASI: nama wajib, email regex, password min 6 + toggle lihat password.
  * =========================================================================
  */
 @Composable
@@ -79,35 +80,38 @@ fun AuthScreen(
         }
     }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .imePadding()
     ) {
-        SkyBackdrop(modifier = Modifier.fillMaxWidth().height(300.dp), tall = true)
-        TopBar(title = "", onBack = onBack, light = true)
+        // Sky backdrop di belakang konten bagian atas (overlay)
+        SkyBackdrop(modifier = Modifier.fillMaxWidth().height(340.dp), tall = true)
 
+        // Konten menumpuk di atas backdrop, bisa di-scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Judul display besar
+            TopBar(title = "", onBack = onBack, light = true)
+
+            // Judul display — berada tepat di area sky (putih menonjol)
             Text(
                 text = if (isRegister) "GRAB A\nSEAT" else "WELCOME\nBACK",
                 style = MaterialTheme.typography.displayLarge,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
             )
 
             Spacer(Modifier.height(24.dp))
 
-            // Kartu form
+            // Kartu form (putih/surface — kontras di light & dark mode)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
                     .clip(RoundedCornerShape(28.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(28.dp))
@@ -131,7 +135,9 @@ fun AuthScreen(
                                 else Color.Transparent
                             )
                         },
-                        keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Next),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                        ),
                         shape = RoundedCornerShape(16.dp),
                         colors = fieldColors()
                     )
@@ -223,7 +229,10 @@ fun AuthScreen(
             Spacer(Modifier.height(24.dp))
 
             // Ganti mode auth
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = if (isRegister) "Have an account? " else "New here? ",
                     style = MaterialTheme.typography.bodyMedium,
@@ -240,7 +249,11 @@ fun AuthScreen(
                 )
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(
+                Modifier
+                    .navigationBarsPadding()
+                    .height(48.dp)
+            )
         }
     }
 }

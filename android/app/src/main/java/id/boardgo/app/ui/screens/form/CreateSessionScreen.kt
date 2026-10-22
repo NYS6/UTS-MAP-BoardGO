@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -265,7 +266,11 @@ fun CreateSessionScreen(
                     loading = state.isSubmitting
                 )
             }
-            Spacer(Modifier.height(40.dp))
+            Spacer(
+                Modifier
+                    .navigationBarsPadding()
+                    .height(118.dp)   // ruang untuk bottom nav (92dp) + jarak aman
+            )
         }
     }
 }

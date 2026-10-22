@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
 | 6 | **Detail Game** | `ui/screens/detail/GameDetailScreen.kt` | Argumen `gameId`, stat blocks, kartu sesi + SeatPill + Join |
 | 7 | **Form / Input** | `ui/screens/form/CreateSessionScreen.kt` | Form validasi angka & email |
 | 8 | **My Games** | `ui/screens/mygames/MyGamesScreen.kt` | Tab Upcoming/Past |
-| 9 | **Fitur Native (Mockup)** | `ui/screens/nativefeature/NativeFeatureScreen.kt` | Mockup **GPS + QR Scanner (kamera) + Biometrik** — tanpa hardware asli |
+| 9 | **Chat Sesi** | `ui/screens/chat/ChatScreen.kt` | Bubble chat (masuk/keluar/sistem), input "Message the table", argumen `sessionId` |
 | 10 | **Profil** | `ui/screens/profile/ProfileScreen.kt` | Statistik, favorit, **toggle dark mode** (System/Light/Dark), log out |
 
 ---
@@ -262,8 +262,8 @@ android/app/src/main/java/id/boardgo/
         ├── detail/GameDetailScreen.kt     // Detail + argumen gameId
         ├── form/CreateSessionScreen.kt    // Form validasi angka & email
         ├── mygames/MyGamesScreen.kt       // Tab Upcoming/Past
-        ├── nativefeature/NativeFeatureScreen.kt // Mockup GPS/QR/Biometrik
-        └── profile/ProfileScreen.kt       // Profil & statistik
+        ├── chat/ChatScreen.kt             // Chat sesi (bubble + input)
+        ├── profile/ProfileScreen.kt       // Profil & statistik
 res/
 ├── font/     // Anton + JetBrains Mono (font asli design web)
 └── drawable/ // 12 foto game game_*.jpg (asli dari repo web)
@@ -286,7 +286,8 @@ res/
 - [x] 2a. Layar List dengan `LazyColumn`
 - [x] 2b. Layar Detail (tampil detail item, argumen gameId)
 - [x] 2c. Layar Form/Input
-- [x] 2d. Layar Fitur Native Mockup (GPS + Kamera/QR + Biometrik, tanpa hardware)
+- [x] 2d. Layar Fitur Native Mockup (GPS — layar **Nearby**: peta mock + jarak/radius
+  tanpa permission GPS asli; lokasi mock juga ada di baris ◉ NEARBY pada Home)
 - [x] 2e. Layar Bebas (Profil)
 - [x] 3. Theme Material 3 custom (color, typography, shapes — bukan template default)
 - [x] 4. State management: ViewModel + StateFlow + remember/mutableStateOf (loading, input)
@@ -297,15 +298,16 @@ res/
 
 ---
 
-## 10. Fitur Mockup Native — Penjelasan untuk Demo
+## 10. Fitur Mockup Native (GPS) — Penjelasan untuk Demo
 
 | Fitur | Implementasi | Yang ditunjukkan ke dosen |
 |-------|--------------|---------------------------|
-| **GPS** | Tombol "Dapatkan Lokasi" → ViewModel simulasi `delay(1200)` → lokasi dummy BSD City + daftar venue terdekat berdasarkan radius (1/3/5/10 km) | Loading state, error state, pemrosesan data jarak |
-| **Kamera (QR)** | Area viewfinder + tombol "Pindai" → simulasi `delay(1500)` → hasil kode QR acak (mis. `BG-CATAN-001`) | Mockup UI kamera + state hasil pindai |
-| **Biometrik** | Ikon sidik jari + tombol "Autentikasi" → simulasi `delay(1400)` → 80% sukses / 20% gagal | Penanganan dua kemungkinan hasil auth |
+| **GPS / Jarak** (layar Nearby, diintegrasi di tab FIND) | Peta mock digambar `Canvas` (jalan/sungai/taman); pin venue diposisikan dari **jarak + bearing** (proyeksi sama dengan web app); lingkaran radius + chip 1/2/3/5/10 km; zoom + recenter (mockup); daftar sesi terurut jarak + badge km | Mockup fitur native tanpa hardware, pemrosesan data jarak, state radius/pilihan venue |
+| **Lokasi mock di Home** | Baris "◉ NEARBY" → simulasi `delay(1200)` → status LOCATING… lalu kembali (mockup locate) | Mockup aksi lokasi UI-only |
 
-Semua mockup **tidak memakai permission** apa pun (tidak ada CAMERA/ACCESS_FINE_LOCATION di manifest) — murni UI + logika simulasi, sesuai ketentuan tugas.
+Catatan revisi: **fitur QR Scanner & Biometrik DIHAPUS** atas permintaan.
+Semua mockup **tidak memakai permission** apa pun (tidak ada CAMERA/ACCESS_FINE_LOCATION
+di manifest) — murni UI + logika simulasi dummy, sesuai ketentuan tugas.
 
 ---
 

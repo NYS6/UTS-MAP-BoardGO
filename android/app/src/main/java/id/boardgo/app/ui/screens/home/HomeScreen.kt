@@ -59,7 +59,6 @@ import id.boardgo.app.ui.viewmodel.LoadStatus
 @Composable
 fun HomeScreen(
     viewModel: BoardGOViewModel,
-    onNearby: () -> Unit,
     onSeeAll: () -> Unit,
     onSessionClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -125,12 +124,12 @@ fun HomeScreen(
 
                                 Spacer(Modifier.height(14.dp))
 
-                                // Baris lokasi -> layar Nearby (fitur jarak GPS)
+                                // Baris lokasi (mockup locate — GPS terintegrasi di tab FIND)
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(10.dp))
-                                        .clickable(onClick = onNearby)
+                                        .clickable { viewModel.mockLocate() }
                                         .padding(vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -174,14 +173,15 @@ fun HomeScreen(
                         }
                     }
 
-                    // ---------- Chip filter game ----------
+                    // ---------- Chip filter game (game utama di depan) ----------
                     item {
                         Spacer(Modifier.height(14.dp))
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            val chips = listOf("All", "catan", "wingspan", "azul", "mars")
+                            val chips =
+                                listOf("All") + DummyData.featuredGameIds + "catan" + "wingspan"
                             items(chips) { chipId ->
                                 val label =
                                     if (chipId == "All") "All" else DummyData.gameById(chipId)?.name ?: chipId

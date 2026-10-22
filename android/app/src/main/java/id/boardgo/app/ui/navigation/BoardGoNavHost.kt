@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,12 +39,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import id.boardgo.app.ui.screens.auth.AuthScreen
+import id.boardgo.app.ui.screens.chat.ChatScreen
 import id.boardgo.app.ui.screens.detail.GameDetailScreen
 import id.boardgo.app.ui.screens.form.CreateSessionScreen
 import id.boardgo.app.ui.screens.home.HomeScreen
 import id.boardgo.app.ui.screens.list.GameListScreen
 import id.boardgo.app.ui.screens.mygames.MyGamesScreen
-import id.boardgo.app.ui.screens.nativefeature.NativeFeatureScreen
 import id.boardgo.app.ui.screens.nearby.NearbyScreen
 import id.boardgo.app.ui.screens.profile.ProfileScreen
 import id.boardgo.app.ui.screens.welcome.WelcomeScreen
@@ -75,13 +75,14 @@ object Routes {
     const val NEARBY = "nearby"
     const val DETAIL = "detail/{gameId}"
     const val CREATE = "create?gameId={gameId}"
+    const val CHAT = "chat/{sessionId}"
     const val MYGAMES = "mygames"
-    const val NATIVE = "native"
     const val PROFILE = "profile"
 
     fun detail(gameId: String) = "detail/$gameId"
     fun create(gameId: String? = null) =
         if (gameId.isNullOrBlank()) "create" else "create?gameId=$gameId"
+    fun chat(sessionId: String) = "chat/$sessionId"
 }
 
 @Composable
@@ -93,11 +94,12 @@ fun BoardGoNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    // Layar tanpa bottom nav (landing & auth)
+    // Layar tanpa bottom nav (landing, auth, chat)
     val hideBottomBar = currentRoute == null ||
         currentRoute == Routes.WELCOME ||
         currentRoute == Routes.REGISTER ||
-        currentRoute == Routes.LOGIN
+        currentRoute == Routes.LOGIN ||
+        currentRoute?.startsWith("chat") == true
 
     Box(
         modifier = modifier
@@ -158,7 +160,6 @@ fun BoardGoNavHost(
             composable(Routes.HOME) {
                 HomeScreen(
                     viewModel = viewModel,
-                    onNearby = { navController.navigate(Routes.NEARBY) },
                     onSeeAll = { navController.navigate(Routes.LIST) },
                     onSessionClick = { gameId ->
                         navController.navigate(Routes.detail(gameId))
@@ -204,6 +205,10 @@ fun BoardGoNavHost(
                     onCreateSession = { selectedGameId ->
                         // >>> PASSING ARGUMENT: gameId -> Form <<<
                         navController.navigate(Routes.create(selectedGameId))
+                    },
+                    onOpenChat = { sessionId ->
+                        // >>> PASSING ARGUMENT: sessionId -> Chat <<<
+                        navController.navigate(Routes.chat(sessionId))
                     }
                 )
             }
@@ -236,13 +241,19 @@ fun BoardGoNavHost(
             composable(Routes.MYGAMES) {
                 MyGamesScreen(
                     viewModel = viewModel,
-                    onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) }
+                    onGameClick = { gameId -> navController.navigate(Routes.detail(gameId)) },
+                    onChat = { sessionId -> navController.navigate(Routes.chat(sessionId)) }
                 )
             }
 
-            // ---------- FITUR NATIVE (MOCKUP) ----------
-            composable(Routes.NATIVE) {
-                NativeFeatureScreen(
+            // ---------- CHAT SESI ----------
+            composable(
+                route = Routes.CHAT,
+                arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
+            ) { entry ->
+                val sessionId = entry.arguments?.getString("sessionId").orEmpty()
+                ChatScreen(
+                    sessionId = sessionId,
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() }
                 )
@@ -296,7 +307,7 @@ private data class NavItem(
     val icon: ImageVector
 )
 
-/** Bottom bar pill melayang — meniru web app (HOME · MINE · + · ME · FITUR). */
+/** Bottom bar pill melayang — meniru web app (HOME · FIND · + · MINE · ME). */
 @Composable
 private fun BottomNavBar(
     currentRoute: String?,
@@ -306,10 +317,10 @@ private fun BottomNavBar(
 ) {
     val items = listOf(
         NavItem(Routes.HOME, "HOME", Icons.Filled.Home),
+        NavItem(Routes.LIST, "FIND", Icons.Filled.Explore),
+        null, // tombol "+" (Host game)
         NavItem(Routes.MYGAMES, "MINE", Icons.Filled.ViewAgenda),
-        null, // tombol "+"
-        NavItem(Routes.PROFILE, "ME", Icons.Filled.Person),
-        NavItem(Routes.NATIVE, "FITUR", Icons.Filled.Place)
+        NavItem(Routes.PROFILE, "ME", Icons.Filled.Person)
     )
 
     Box(
@@ -357,10 +368,9 @@ private fun BottomNavBar(
                     NavButton(
                         item = item,
                         selected = currentRoute == item.route ||
-                            (item.route == Routes.HOME &&
-                                (currentRoute?.startsWith("detail") == true ||
-                                    currentRoute == Routes.LIST ||
-                                    currentRoute == Routes.NEARBY)),
+                            (item.route == Routes.LIST &&
+                                (currentRoute == Routes.NEARBY ||
+                                    currentRoute?.startsWith("detail") == true)),
                         onClick = { onNavigate(item.route) }
                     )
                 }

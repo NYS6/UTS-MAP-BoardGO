@@ -16,17 +16,20 @@ import id.boardgo.app.data.model.Venue
 object DummyData {
 
     // ---------------------------------------------------------------------
-    // Katalog game (12 game, sama dengan web app)
+    // Katalog game — MAHJONG & MONOPOLY di urutan depan sebagai GAME UTAMA
+    // (paling populer), sesuai permintaan revisi.
     // ---------------------------------------------------------------------
+    val featuredGameIds = listOf("mahjong", "monopoly")
+
     val games: List<Game> = listOf(
+        Game("mahjong", "Mahjong", "The classic four-player tile game of skill, luck and sharp memory.", "4", "90 min", Difficulty.MEDIUM, Category.TILE_CARD),
+        Game("monopoly", "Monopoly", "Buy, trade and build your way to a property empire. Friendships may vary.", "2–6", "120 min", Difficulty.EASY, Category.FAMILY),
         Game("catan", "Catan", "Trade, build and settle the island of Catan. Gather resources and outmaneuver rivals.", "3–4", "75 min", Difficulty.MEDIUM, Category.STRATEGY),
         Game("wingspan", "Wingspan", "Attract birds to your wildlife preserves in this engine-building card game.", "1–5", "60 min", Difficulty.MEDIUM, Category.STRATEGY),
         Game("mars", "Terraforming Mars", "Lead a corporation to make Mars habitable. Heavy, rewarding strategy.", "1–5", "120 min", Difficulty.HARD, Category.STRATEGY),
         Game("azul", "Azul", "Draft gorgeous tiles to decorate the walls of the Royal Palace of Evora.", "2–4", "40 min", Difficulty.EASY, Category.TILE_CARD),
         Game("splendor", "Splendor", "Collect gems and build a Renaissance merchant empire.", "2–4", "30 min", Difficulty.EASY, Category.TILE_CARD),
-        Game("mahjong", "Mahjong", "The classic four-player tile game of skill, luck and sharp memory.", "4", "90 min", Difficulty.MEDIUM, Category.TILE_CARD),
         Game("ticket", "Ticket to Ride", "Claim railway routes across the map and connect distant cities.", "2–5", "60 min", Difficulty.EASY, Category.FAMILY),
-        Game("monopoly", "Monopoly", "Buy, trade and build your way to a property empire. Friendships may vary.", "2–6", "120 min", Difficulty.EASY, Category.FAMILY),
         Game("chess", "Chess", "The timeless duel of strategy. Casual or rated, every level welcome.", "2", "30 min", Difficulty.HARD, Category.CLASSIC),
         Game("checkers", "Checkers", "Jump, capture and crown your pieces in this quick classic.", "2", "20 min", Difficulty.EASY, Category.CLASSIC),
         Game("scrabble", "Scrabble", "Build words on the grid and hunt for triple-word scores.", "2–4", "60 min", Difficulty.MEDIUM, Category.WORD),
@@ -62,19 +65,20 @@ object DummyData {
     )
 
     // ---------------------------------------------------------------------
-    // Sesi bermain (s7 = sesi lampau, meniru web app)
+    // Sesi bermain (s8 mahjong & s11 monopoly = sesi utama;
+    // s7 = sesi lampau untuk tab Past di My Games)
     // ---------------------------------------------------------------------
     val sessions: List<GameSession> = listOf(
+        GameSession("s8", "mahjong", "v1", "u4", "Tomorrow", "19:00", 4, listOf("u4", "u1"), Level.CASUAL, "Hong Kong rules, we'll teach scoring.", "Free"),
+        GameSession("s11", "monopoly", "v8", "u5", "Sat", "14:00", 6, listOf("u5", "u1", "u4"), Level.CASUAL, "House rules: Free Parking jackpot.", "Rp20k"),
         GameSession("s1", "catan", "v1", "u2", "Tonight", "19:30", 4, listOf("u2", "u1", "u3"), Level.CASUAL, "Base game + Seafarers if we're quick. Beginners welcome!", "Free"),
         GameSession("s2", "wingspan", "v2", "u1", "Tonight", "20:00", 5, listOf("u1", "u4", "u5"), Level.CASUAL, "European expansion included.", "Rp25k"),
         GameSession("s3", "azul", "v3", "u4", "Tomorrow", "18:00", 4, listOf("u4", "u2", "u5"), Level.BEGINNER, "Chill game, rules taught.", "Free"),
         GameSession("s4", "mars", "v4", "u3", "Sat", "13:00", 5, listOf("u3", "me"), Level.COMPETITIVE, "Full corporate era with Prelude. Bring snacks.", "Rp30k"),
         GameSession("s5", "ticket", "v6", "u5", "Sat", "16:00", 5, listOf("u5"), Level.CASUAL, "Europe map.", "Free"),
         GameSession("s6", "splendor", "v5", "u3", "Sun", "15:00", 4, listOf("u3", "u4"), Level.CASUAL, "Quick games, multiple rounds.", "Rp15k"),
-        GameSession("s8", "mahjong", "v1", "u4", "Tomorrow", "19:00", 4, listOf("u4", "u1"), Level.CASUAL, "Hong Kong rules, we'll teach scoring.", "Free"),
         GameSession("s9", "chess", "v7", "u3", "Tonight", "18:30", 2, listOf("u3"), Level.COMPETITIVE, "Rapid 15+10. Bring your best opening.", "Free"),
         GameSession("s10", "checkers", "v7", "u2", "Sun", "10:00", 2, listOf("u2"), Level.BEGINNER, "Relaxed Sunday morning game.", "Free"),
-        GameSession("s11", "monopoly", "v8", "u5", "Sat", "14:00", 6, listOf("u5", "u1", "u4"), Level.CASUAL, "House rules: Free Parking jackpot.", "Rp20k"),
         GameSession("s12", "werewolf", "v6", "u1", "Sat", "19:00", 10, listOf("u1", "u2", "u4", "u5"), Level.BEGINNER, "Big group night, moderator provided.", "Rp10k"),
         GameSession("s13", "scrabble", "v3", "u4", "Sun", "16:00", 4, listOf("u4"), Level.CASUAL, "English dictionary, timer optional.", "Free"),
         GameSession("s7", "catan", "v2", "me", "Last Fri", "19:00", 4, listOf("me", "u1", "u2", "u4"), Level.CASUAL, "Done! Great games.", "Free")

@@ -47,6 +47,7 @@ import id.boardgo.app.ui.viewmodel.BoardGOViewModel
 fun MyGamesScreen(
     viewModel: BoardGOViewModel,
     onGameClick: (String) -> Unit,
+    onChat: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.myGamesState.collectAsStateWithLifecycle()
@@ -105,6 +106,7 @@ fun MyGamesScreen(
                         session = session,
                         past = state.showPast,
                         onClick = { onGameClick(session.gameId) },
+                        onChat = { onChat(session.id) },
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                     )
                 }
@@ -151,6 +153,7 @@ private fun SessionRow(
     session: GameSession,
     past: Boolean,
     onClick: () -> Unit,
+    onChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val game = DummyData.gameById(session.gameId)
@@ -199,7 +202,11 @@ private fun SessionRow(
                     Text(
                         text = "open chat →",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .clickable(onClick = onChat)
+                            .padding(horizontal = 2.dp, vertical = 2.dp)
                     )
                 }
             }
